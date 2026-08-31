@@ -1,0 +1,849 @@
+<!doctype html>
+<html lang="ru">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1.0" />
+    <title>Наш дневник — Команда развития</title>
+    <style>
+      :root {
+        --bg: #f3efe7;
+        --paper: #fffdf8;
+        --green: #1e6a4a;
+        --green2: #4f9b72;
+        --text: #22342b;
+        --soft: #eef5f0;
+        --muted: #7f8d85;
+        --border: #1e6a4a1f;
+      }
+      * {
+        box-sizing: border-box;
+      }
+      body {
+        margin: 0;
+        font-family: Arial, sans-serif;
+        background: var(--bg);
+        color: var(--text);
+      }
+      .page {
+        padding: 28px;
+      }
+      .shell {
+        width: min(1200px, 100%);
+        margin: auto;
+        display: grid;
+        gap: 22px;
+      }
+      .hero {
+        background: var(--green);
+        color: #fff;
+        border-radius: 26px;
+        padding: 30px;
+        display: flex;
+        justify-content: space-between;
+        gap: 24px;
+        align-items: flex-start;
+      }
+      .hero small {
+        display: block;
+        text-transform: uppercase;
+        letter-spacing: 0.13em;
+        opacity: 0.7;
+        margin-bottom: 8px;
+      }
+      h1 {
+        margin: 0;
+        font-size: clamp(30px, 4vw, 54px);
+        letter-spacing: -0.04em;
+      }
+      .hero p {
+        max-width: 720px;
+        line-height: 1.5;
+        margin: 12px 0 0;
+        opacity: 0.92;
+      }
+      .hero-actions {
+        display: flex;
+        gap: 10px;
+        flex-wrap: wrap;
+        justify-content: flex-end;
+      }
+      .back,
+      .diary-action {
+        color: var(--green);
+        background: #fff;
+        text-decoration: none;
+        font-weight: 800;
+        padding: 12px 16px;
+        border-radius: 12px;
+        white-space: nowrap;
+        border: 0;
+        cursor: pointer;
+      }
+      .diary-action {
+        color: #fff;
+        background: var(--green2);
+      }
+
+      .card,
+      .section {
+        background: var(--paper);
+        border-radius: 20px;
+        padding: 22px;
+        border: 1px solid var(--border);
+        box-shadow: 0 10px 28px #28372d0f;
+      }
+      .card h2,
+      .section h2 {
+        margin: 0 0 14px;
+        font-size: 22px;
+      }
+
+      .goal {
+        font-size: 18px;
+        line-height: 1.5;
+        font-weight: 700;
+        color: var(--green);
+      }
+
+      .section-head {
+        display: flex;
+        justify-content: space-between;
+        align-items: end;
+        gap: 14px;
+        margin-bottom: 18px;
+      }
+      .section-head p {
+        margin: 0;
+        color: var(--muted);
+        font-size: 14px;
+      }
+      .temperature {
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        gap: 14px;
+      }
+      .temp-card {
+        background: var(--soft);
+        border-radius: 16px;
+        padding: 16px;
+      }
+      .temp-card strong {
+        display: block;
+        margin-bottom: 8px;
+      }
+      .spark {
+        width: 100%;
+        height: 84px;
+      }
+      .spark polyline {
+        fill: none;
+        stroke: var(--green);
+        stroke-width: 4;
+        stroke-linecap: round;
+        stroke-linejoin: round;
+      }
+      .spark line {
+        stroke: #cfd8d2;
+        stroke-width: 1;
+      }
+      .score {
+        font-size: 28px;
+        font-weight: 900;
+        color: var(--green);
+        margin-top: 4px;
+      }
+      .score-note {
+        font-size: 12px;
+        color: var(--muted);
+        margin-top: 2px;
+      }
+      .entries {
+        display: grid;
+        gap: 14px;
+      }
+      .entry {
+        border: 1px solid var(--border);
+        border-radius: 18px;
+        padding: 18px;
+        background: #fff;
+      }
+      .entry-top {
+        display: flex;
+        justify-content: space-between;
+        gap: 16px;
+        margin-bottom: 12px;
+      }
+      .entry-date {
+        font-size: 13px;
+        color: var(--muted);
+        font-weight: 700;
+      }
+      .entry-stage {
+        font-weight: 900;
+        color: var(--green);
+      }
+      .entry-grid {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 12px 18px;
+      }
+      .field {
+        background: #faf8f3;
+        border-radius: 12px;
+        padding: 12px;
+        white-space: pre-wrap;
+        line-height: 1.45;
+      }
+      .field strong {
+        display: block;
+        font-size: 12px;
+        text-transform: uppercase;
+        letter-spacing: 0.05em;
+        opacity: 0.55;
+        margin-bottom: 6px;
+      }
+      .scores {
+        display: flex;
+        gap: 8px;
+        flex-wrap: wrap;
+        margin-top: 12px;
+      }
+      .score-pill {
+        background: var(--soft);
+        border-radius: 999px;
+        padding: 8px 10px;
+        font-size: 13px;
+      }
+      .status {
+        padding: 16px;
+        border-radius: 14px;
+        background: var(--soft);
+        color: var(--muted);
+      }
+      .status.error {
+        color: #8b2e2e;
+        background: #fff0ee;
+      }
+
+      /* =========================================================
+   СТАРТОВАЯ КАРТА
+   ========================================================= */
+
+      .start-map {
+        display: grid;
+        gap: 18px;
+      }
+
+      /* ---------------------------------------------------------
+   Сильные стороны + болевые точки
+   --------------------------------------------------------- */
+
+      .start-details {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 18px;
+      }
+
+      /* ---------------------------------------------------------
+   Если данных пока нет
+   --------------------------------------------------------- */
+
+      .start-empty {
+        font-size: 14px;
+        font-style: italic;
+
+        color: var(--muted);
+      }
+
+      /* =========================================================
+   АККОРДЕОН СТАРТОВОЙ КАРТЫ
+   ========================================================= */
+
+      .start-item {
+        padding: 0;
+
+        border-bottom: 1px solid var(--border);
+      }
+
+      .start-item:last-child {
+        border-bottom: 0;
+      }
+
+      .start-item-button {
+        width: 100%;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 16px;
+
+        padding: 9px 0;
+
+        font: inherit;
+        text-align: left;
+
+        color: var(--text);
+        background: transparent;
+        border: 0;
+        cursor: pointer;
+      }
+
+      .start-item-title {
+        margin: 0;
+
+        font-size: 15px;
+        font-weight: 400;
+        line-height: 1.35;
+      }
+
+      .start-item-icon {
+        flex: 0 0 auto;
+
+        font-size: 20px;
+        line-height: 1;
+
+        color: var(--green);
+
+        transition: transform 0.25s ease;
+      }
+
+      .start-item.open .start-item-icon {
+        transform: rotate(45deg);
+      }
+      .start-item-panel {
+        height: 0;
+        overflow: hidden;
+
+        transition: height 0.28s ease;
+      }
+
+      .start-item-detail {
+        padding: 0 0 14px;
+
+        font-size: 14px;
+        line-height: 1.5;
+
+        color: var(--text);
+      }
+
+      .start-item-detail em {
+        color: var(--muted);
+      }
+
+      /* Временно скрываем цель */
+      .start-goal {
+        display: none;
+      }
+
+      @media (max-width: 800px) {
+        .page {
+          padding: 14px;
+        }
+
+        .hero {
+          flex-direction: column;
+        }
+
+        .hero-actions {
+          justify-content: flex-start;
+        }
+
+        .temperature,
+        .entry-grid,
+        .start-details {
+          grid-template-columns: 1fr;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <main class="page">
+      <div class="shell">
+        <section class="hero">
+          <div>
+            <small>Закрытый раздел команды</small>
+            <h1>Наш дневник</h1>
+            <p id="teamIntro">Загружаем записи команды…</p>
+          </div>
+          <div class="hero-actions">
+            <a
+              class="diary-action"
+              id="diaryFormLink"
+              href="#"
+              target="_blank"
+              rel="noopener"
+              hidden
+              >Добавить запись в дневник →</a
+            ><a class="back" href="team_main_prototype.html">← На главную</a>
+          </div>
+        </section>
+
+        <!-- ======================================================
+     СТАРТОВАЯ КАРТА КОМАНДЫ
+     ====================================================== -->
+
+        <section class="start-map">
+          <!-- Цель -->
+          <article class="card start-goal">
+            <h2>С чего мы начинали</h2>
+
+            <div class="goal">
+              <strong>Наша цель:</strong>
+              <span id="startGoal">Загружаем данные…</span>
+            </div>
+          </article>
+
+          <!-- Сильные стороны + болевые точки -->
+          <div class="start-details">
+            <article class="card">
+              <h2>Наши сильные стороны</h2>
+
+              <div id="startStrengths" class="start-list"></div>
+            </article>
+
+            <article class="card">
+              <h2>Болевые точки</h2>
+
+              <div id="startPains" class="start-list"></div>
+            </article>
+          </div>
+        </section>
+
+        <section class="section" id="temperatureSection">
+          <div class="section-head">
+            <div>
+              <h2>Температура команды</h2>
+              <p>Быстрая оценка трёх базовых потребностей</p>
+            </div>
+          </div>
+          <div class="temperature" id="temperature"></div>
+        </section>
+
+        <section class="section">
+          <div class="section-head">
+            <div>
+              <h2>История рефлексий</h2>
+              <p>
+                Каждая новая отправка «Дневника роста» автоматически добавляет
+                новую запись
+              </p>
+            </div>
+          </div>
+          <div class="entries" id="entries">
+            <div class="status">Загружаем записи…</div>
+          </div>
+        </section>
+      </div>
+    </main>
+
+    <script>
+      const API_URL =
+        "https://script.google.com/macros/s/AKfycbwvo20hYq9BOZOmi_dmhT55mdpgRrsPJ1CVy0UkisnoDYTF5jOL7ZOyBr99UXLE42Kp/exec";
+
+      // Для теста по умолчанию открывается 171-я команда.
+      // Позже тот же файл можно использовать для любой команды:
+      // team_diary_live.html?team_id=Team_28_Kaliningrad
+      const params = new URLSearchParams(window.location.search);
+      const TEAM_ID = params.get("team_id") || "Team_171_SPb";
+
+      function formatTeamId(teamId) {
+        return teamId.replaceAll("_", " ");
+      }
+
+      function parseRuDate(value) {
+        // API отдаёт dd.MM.yyyy HH:mm
+        const m = String(value || "").match(
+          /^(\d{2})\.(\d{2})\.(\d{4})\s+(\d{2}):(\d{2})$/,
+        );
+        if (!m) return null;
+        return new Date(
+          Number(m[3]),
+          Number(m[2]) - 1,
+          Number(m[1]),
+          Number(m[4]),
+          Number(m[5]),
+        );
+      }
+
+      function prettyDate(value) {
+        const d = parseRuDate(value);
+        if (!d) return value || "";
+        return new Intl.DateTimeFormat("ru-RU", {
+          day: "numeric",
+          month: "long",
+          year: "numeric",
+          hour: "2-digit",
+          minute: "2-digit",
+        }).format(d);
+      }
+
+      function numericSeries(entries, key) {
+        return entries
+          .map((item) => Number(item[key]))
+          .filter((v) => Number.isFinite(v) && v >= 1 && v <= 5);
+      }
+
+      function average(values) {
+        if (!values.length) return null;
+        return values.reduce((a, b) => a + b, 0) / values.length;
+      }
+
+      function sparkPoints(values) {
+        if (!values.length) return "";
+        const left = 10,
+          right = 230,
+          top = 12,
+          bottom = 70;
+        const width = right - left;
+        const step = values.length === 1 ? 0 : width / (values.length - 1);
+        return values
+          .map((v, i) => {
+            const x = values.length === 1 ? 120 : left + i * step;
+            const y = bottom - ((v - 1) / 4) * (bottom - top);
+            return `${x.toFixed(1)},${y.toFixed(1)}`;
+          })
+          .join(" ");
+      }
+
+      function metricTitle(field) {
+        const name = String(
+          field.question_name || field.field_key || "Показатель",
+        ).trim();
+
+        const marker = "Быстрая оценка трёх базовых потребностей:";
+
+        if (name.includes(marker)) {
+          return name.split(marker)[1].trim();
+        }
+
+        return name;
+      }
+
+      function renderTemperature(fields, entries) {
+        const root = document.getElementById("temperature");
+        const section = document.getElementById("temperatureSection");
+        root.innerHTML = "";
+
+        const scaleFields = fields.filter((field) => field.type === "scale");
+
+        if (!scaleFields.length) {
+          section.style.display = "none";
+          return;
+        }
+
+        section.style.display = "block";
+
+        scaleFields.forEach((field) => {
+          const values = numericSeries(entries, field.field_key);
+          const avg = average(values);
+
+          const card = document.createElement("div");
+          card.className = "temp-card";
+
+          const title = document.createElement("strong");
+          title.textContent = metricTitle(field);
+
+          const svg = document.createElementNS(
+            "http://www.w3.org/2000/svg",
+            "svg",
+          );
+          svg.setAttribute("class", "spark");
+          svg.setAttribute("viewBox", "0 0 240 84");
+
+          const line = document.createElementNS(
+            "http://www.w3.org/2000/svg",
+            "line",
+          );
+          line.setAttribute("x1", "0");
+          line.setAttribute("y1", "70");
+          line.setAttribute("x2", "240");
+          line.setAttribute("y2", "70");
+
+          const polyline = document.createElementNS(
+            "http://www.w3.org/2000/svg",
+            "polyline",
+          );
+          polyline.setAttribute("points", sparkPoints(values));
+
+          svg.append(line, polyline);
+
+          const score = document.createElement("div");
+          score.className = "score";
+          score.textContent = avg === null ? "—" : avg.toFixed(1);
+
+          const note = document.createElement("div");
+          note.className = "score-note";
+          note.textContent = "среднее";
+
+          card.append(title, svg, score, note);
+          root.appendChild(card);
+        });
+      }
+
+      function addField(container, label, value) {
+        if (
+          value === undefined ||
+          value === null ||
+          String(value).trim() === ""
+        )
+          return;
+        const field = document.createElement("div");
+        field.className = "field";
+        const strong = document.createElement("strong");
+        strong.textContent = label;
+        const text = document.createTextNode(String(value));
+        field.append(strong, text);
+        container.appendChild(field);
+      }
+
+      function renderEntries(history) {
+        const root = document.getElementById("entries");
+        root.innerHTML = "";
+
+        if (!history.length) {
+          root.innerHTML =
+            '<div class="status">У этой команды пока нет записей дневника.</div>';
+          return;
+        }
+
+        // ВАЖНО: карточки истории строим из data.history.
+        // Там сохранены реальные вопросы, их типы и порядок на момент заполнения.
+        [...history].reverse().forEach((item, index) => {
+          const article = document.createElement("article");
+          article.className = "entry";
+
+          const top = document.createElement("div");
+          top.className = "entry-top";
+          const topInner = document.createElement("div");
+          const stage = document.createElement("div");
+          stage.className = "entry-stage";
+          stage.textContent = `Запись дневника ${history.length - index}`;
+          const date = document.createElement("div");
+          date.className = "entry-date";
+          date.textContent = prettyDate(item.finish_date);
+          topInner.append(stage, date);
+          top.appendChild(topInner);
+
+          const grid = document.createElement("div");
+          grid.className = "entry-grid";
+
+          const scores = document.createElement("div");
+          scores.className = "scores";
+
+          const questions = Array.isArray(item.questions) ? item.questions : [];
+
+          questions.forEach((question) => {
+            const value = question.value;
+            if (
+              value === undefined ||
+              value === null ||
+              String(value).trim() === ""
+            )
+              return;
+
+            if (question.type === "scale") {
+              const pill = document.createElement("span");
+              pill.className = "score-pill";
+              pill.textContent = `${metricTitle({ question_name: question.question_name, field_key: "" })} ${value}`;
+              scores.appendChild(pill);
+              return;
+            }
+
+            addField(grid, question.question_name || "Вопрос", value);
+          });
+
+          article.append(top);
+          if (grid.children.length) article.appendChild(grid);
+          if (scores.children.length) article.appendChild(scores);
+          root.appendChild(article);
+        });
+      }
+
+      /* =========================================================
+   СТАРТОВАЯ КАРТА
+   ========================================================= */
+
+      function renderStartMap(startMap) {
+        const start = startMap || {};
+
+        // -------------------------------------------------------
+        // Цель
+        // -------------------------------------------------------
+
+        const goal = String(start.goal || "").trim();
+
+        document.getElementById("startGoal").textContent =
+          goal || "Стартовая карта пока не заполнена.";
+
+        // -------------------------------------------------------
+        // Сильные стороны
+        // -------------------------------------------------------
+
+        renderStartList(
+          "startStrengths",
+          start.strengths,
+          "Почему нам это важно",
+          "why",
+        );
+
+        // -------------------------------------------------------
+        // Болевые точки
+        // -------------------------------------------------------
+
+        renderStartList(
+          "startPains",
+          start.pains,
+          "Как она проявляется",
+          "manifestation",
+        );
+      }
+      function renderStartList(containerId, items, detailLabel, detailKey) {
+        const root = document.getElementById(containerId);
+
+        root.innerHTML = "";
+
+        const values = Array.isArray(items) ? items : [];
+
+        if (!values.length) {
+          const empty = document.createElement("div");
+
+          empty.className = "start-empty";
+
+          empty.textContent = "Стартовая карта пока не заполнена.";
+
+          root.appendChild(empty);
+
+          return;
+        }
+
+        values.forEach((item, index) => {
+          const text = String(item.text || "").trim();
+
+          const detail = String(item[detailKey] || "").trim();
+
+          if (!text) {
+            return;
+          }
+
+          const block = document.createElement("div");
+
+          block.className = "start-item";
+
+          /* -----------------------------
+         Кнопка строки
+         ----------------------------- */
+
+          const button = document.createElement("button");
+
+          button.className = "start-item-button";
+
+          button.type = "button";
+
+          const title = document.createElement("div");
+
+          title.className = "start-item-title";
+
+          title.textContent = `${index + 1}. ${text}`;
+
+          const icon = document.createElement("span");
+
+          icon.className = "start-item-icon";
+
+          icon.textContent = "+";
+
+          button.append(title, icon);
+
+          block.appendChild(button);
+
+          /* -----------------------------
+         Панель
+         ----------------------------- */
+
+          const panel = document.createElement("div");
+
+          panel.className = "start-item-panel";
+
+          const detailBlock = document.createElement("div");
+
+          detailBlock.className = "start-item-detail";
+
+          const label = document.createElement("em");
+
+          label.textContent = detailLabel + ": ";
+
+          const answer = document.createTextNode(detail || "Ответ не указан.");
+
+          detailBlock.append(label, answer);
+
+          panel.appendChild(detailBlock);
+
+          block.appendChild(panel);
+
+          /* -----------------------------
+         Открытие / закрытие
+         ----------------------------- */
+
+          button.addEventListener("click", () => {
+            const isOpen = block.classList.contains("open");
+
+            block.classList.toggle("open", !isOpen);
+
+            panel.style.height = isOpen
+              ? "0px"
+              : detailBlock.scrollHeight + "px";
+          });
+
+          root.appendChild(block);
+        });
+      }
+
+      async function loadDiary() {
+        document.getElementById("teamIntro").textContent =
+          `${formatTeamId(TEAM_ID)}. Здесь собраны рефлексии и динамика командной «температуры».`;
+        document.title = `Наш дневник — ${formatTeamId(TEAM_ID)}`;
+
+        try {
+          const response = await fetch(
+            `${API_URL}?team_id=${encodeURIComponent(TEAM_ID)}`,
+            { cache: "no-store" },
+          );
+          if (!response.ok) throw new Error(`HTTP ${response.status}`);
+          const data = await response.json();
+          if (!data.success) throw new Error(data.error || "API вернул ошибку");
+
+          const fields = Array.isArray(data.fields) ? data.fields : [];
+          const entries = Array.isArray(data.entries) ? data.entries : [];
+          const history = Array.isArray(data.history) ? data.history : [];
+          const startMap = data.start_map || {};
+
+          renderStartMap(startMap);
+
+          const teamName = String(
+            data.team_name || formatTeamId(TEAM_ID),
+          ).trim();
+          const diaryFormUrl = String(data.diary_form_url || "").trim();
+
+          document.getElementById("teamIntro").textContent =
+            `${teamName}. Здесь собраны рефлексии и динамика командной «температуры».`;
+          document.title = `Наш дневник — ${teamName}`;
+
+          const diaryFormLink = document.getElementById("diaryFormLink");
+          if (diaryFormUrl) {
+            diaryFormLink.href = diaryFormUrl;
+            diaryFormLink.hidden = false;
+          } else {
+            diaryFormLink.hidden = true;
+          }
+
+          renderTemperature(fields, entries);
+          renderEntries(history);
+        } catch (error) {
+          console.error(error);
+          document.getElementById("entries").innerHTML =
+            `<div class="status error">Не удалось загрузить дневник. ${error.message}</div>`;
+        }
+      }
+
+      loadDiary();
+    </script>
+  </body>
+</html>

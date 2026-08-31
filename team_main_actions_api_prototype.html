@@ -1,0 +1,797 @@
+<!doctype html>
+<html lang="ru">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Главная страницы команды — Стартовая карта</title>
+    <style>
+      :root {
+        --bg: #f3efe7;
+        --paper: #fffdf8;
+        --green: #1e6a4a;
+        --green-soft: #eef5f0;
+        --muted: #d4cec3;
+        --text: #22342b;
+        --subtle: #68776f;
+        --chip: #eef0ed;
+        --line: #1e6a4a1f;
+      }
+
+      * {
+        box-sizing: border-box;
+      }
+
+      body {
+        margin: 0;
+        font-family: Arial, sans-serif;
+        color: var(--text);
+        background: var(--bg);
+      }
+
+      /* =========================================================
+   PAGE / ОБЩАЯ КОМПОЗИЦИЯ
+   ========================================================= */
+      .page {
+        padding: 28px;
+      }
+
+      .shell {
+        width: min(1400px, 100%);
+        margin: auto;
+        display: grid;
+        gap: 18px;
+      }
+
+      /* =========================================================
+   ШАПКА КОМАНДЫ
+   ========================================================= */
+      .topbar {
+        display: flex;
+        align-items: flex-start;
+        justify-content: space-between;
+        gap: 28px;
+
+        padding: 24px 28px;
+
+        background: #ffffffdf;
+        border: 1px solid #ffffffaa;
+        border-radius: 24px;
+        box-shadow: 0 12px 36px #28372d14;
+      }
+
+      .team-copy {
+        min-width: 0;
+        flex: 1 1 auto;
+      }
+
+      .eyebrow {
+        margin-bottom: 7px;
+
+        font-size: 12px;
+        letter-spacing: 0.12em;
+        text-transform: uppercase;
+
+        opacity: 0.5;
+      }
+
+      h1 {
+        margin: 0;
+
+        font-size: clamp(30px, 4vw, 54px);
+        line-height: 1;
+        letter-spacing: -0.04em;
+      }
+
+      .team-meta {
+        margin-top: 15px;
+        display: grid;
+        gap: 8px;
+        max-width: 980px;
+      }
+
+      .meta-line {
+        margin: 0;
+
+        font-size: 15px;
+        line-height: 1.45;
+      }
+
+      .meta-line strong {
+        color: var(--green);
+      }
+
+      .actions {
+        flex: 0 0 auto;
+        display: flex;
+        flex-direction: column;
+        align-items: stretch;
+        gap: 9px;
+        min-width: 170px;
+      }
+
+      .action-link {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        gap: 8px;
+
+        min-height: 42px;
+        padding: 10px 14px;
+
+        font-size: 13px;
+        font-weight: 800;
+        text-decoration: none;
+        white-space: nowrap;
+
+        color: #fff;
+        background: var(--green);
+        border-radius: 11px;
+      }
+
+      .action-link.diary {
+        min-height: 44px;
+      }
+
+      .survey-actions {
+        display: grid;
+        grid-template-columns: 1fr;
+        gap: 7px;
+      }
+
+      .action-link.survey {
+        min-height: 36px;
+        padding: 8px 12px;
+
+        font-size: 12px;
+
+        color: var(--green);
+        background: #f1f0ec;
+        border: 1px solid #1e6a4a24;
+      }
+
+      .action-link.survey:hover {
+        background: var(--green-soft);
+      }
+
+      .action-link[hidden] {
+        display: none;
+      }
+
+      /* =========================================================
+   СТАРТОВАЯ КАРТА — 3 ИНФОРМАЦИОННЫЕ ПЛАШКИ
+   ========================================================= */
+      .start-summary {
+        display: grid;
+        grid-template-columns: 1fr 1fr 1.08fr;
+        gap: 14px;
+      }
+
+      .summary-card {
+        min-width: 0;
+        padding: 18px 20px;
+
+        background: var(--paper);
+        border: 1px solid var(--line);
+        border-radius: 18px;
+        box-shadow: 0 8px 22px #28372d0c;
+      }
+
+      .summary-card h2 {
+        margin: 0 0 12px;
+
+        font-size: 17px;
+        line-height: 1.2;
+      }
+
+      .chips {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 7px;
+      }
+
+      .chip {
+        padding: 7px 10px;
+
+        font-size: 12px;
+        line-height: 1.3;
+
+        background: var(--chip);
+        border-radius: 999px;
+      }
+
+      .empty-state {
+        display: inline-block;
+
+        font-size: 13px;
+        font-style: italic;
+        line-height: 1.4;
+
+        color: #8f9892;
+      }
+
+      .placeholder-text {
+        font-style: italic;
+        color: #8f9892;
+      }
+
+      .chip.placeholder {
+        color: #8f9892;
+        background: #f2f2ef;
+        border: 1px dashed #cfd4d0;
+      }
+
+      .expectations-grid {
+        display: grid;
+        gap: 10px;
+      }
+
+      .expectation-block {
+        padding: 11px 12px;
+
+        font-size: 12px;
+        line-height: 1.45;
+
+        background: #faf8f3;
+        border-radius: 12px;
+      }
+
+      .expectation-block strong {
+        display: block;
+        margin-bottom: 4px;
+
+        font-size: 11px;
+        text-transform: uppercase;
+        letter-spacing: 0.04em;
+        color: var(--green);
+      }
+
+      /* =========================================================
+   КАРТА — пока сохраняем существующий прототип
+   ========================================================= */
+      .board {
+        position: relative;
+        width: 100%;
+        aspect-ratio: 16/9;
+        overflow: hidden;
+
+        background:
+          radial-gradient(circle at 18% 22%, #ffffffea, transparent 22%),
+          radial-gradient(circle at 80% 70%, #ffffffbd, transparent 20%),
+          var(--paper);
+        border-radius: 28px;
+        box-shadow: 0 18px 55px #28372d1f;
+      }
+
+      .board-title {
+        position: absolute;
+        left: 5%;
+        top: 5%;
+        z-index: 4;
+      }
+
+      .board-title h2 {
+        margin: 0;
+        font-size: clamp(22px, 3vw, 42px);
+      }
+
+      .board-title p {
+        margin: 6px 0 0;
+        font-size: 14px;
+        opacity: 0.6;
+      }
+
+      .route {
+        position: absolute;
+        inset: 0;
+        width: 100%;
+        height: 100%;
+      }
+
+      .route-base,
+      .route-progress {
+        fill: none;
+        stroke-linecap: round;
+        stroke-linejoin: round;
+        stroke-width: 12px;
+      }
+
+      .route-base {
+        stroke: var(--muted);
+      }
+      .route-progress {
+        stroke: var(--green);
+      }
+      #progressClipRect {
+        transition: width 5.2s linear;
+      }
+
+      .checkpoint {
+        position: absolute;
+        z-index: 3;
+        transform: translate(-50%, -50%) scale(0.84);
+        opacity: 0.5;
+        transition:
+          opacity 0.12s linear,
+          transform 0.12s linear;
+      }
+
+      .checkpoint.active {
+        transform: translate(-50%, -50%) scale(1);
+        opacity: 1;
+      }
+
+      .picture {
+        position: relative;
+        width: clamp(72px, 8vw, 120px);
+        height: clamp(72px, 8vw, 120px);
+        overflow: hidden;
+
+        background: #fff;
+        border: 1px solid #1e6a4a1f;
+        border-radius: 28px;
+        box-shadow: 0 12px 26px #1e3c2d21;
+      }
+
+      .picture .mono,
+      .picture .color {
+        position: absolute;
+        inset: 0;
+        display: grid;
+        place-items: center;
+
+        font-size: clamp(36px, 4vw, 60px);
+      }
+
+      .picture .mono {
+        filter: grayscale(1);
+        opacity: 0.4;
+      }
+
+      .picture .color {
+        clip-path: inset(0 100% 0 0);
+        transition: none;
+      }
+
+      .checkpoint.active .picture .color {
+        clip-path: inset(0 0 0 0);
+      }
+
+      .label {
+        margin-top: 8px;
+        text-align: center;
+        font-size: clamp(10px, 1vw, 14px);
+        font-weight: 700;
+      }
+
+      .reflection-star {
+        position: absolute;
+        z-index: 4;
+        width: 42px;
+        height: 42px;
+        display: grid;
+        place-items: center;
+        transform: translate(-50%, -50%) scale(0.86);
+
+        font-size: 22px;
+
+        color: var(--text);
+        background: #fff;
+        border: 2px dashed var(--muted);
+        border-radius: 50%;
+        opacity: 0.35;
+        transition: 0.4s ease;
+      }
+
+      .reflection-star.active {
+        transform: translate(-50%, -50%) scale(1);
+
+        color: var(--green);
+        border-style: solid;
+        border-color: var(--green);
+        opacity: 1;
+        box-shadow: 0 8px 18px #1e6a4a1f;
+      }
+
+      .reflection-star::after {
+        content: "рефлексия";
+        position: absolute;
+        top: 46px;
+
+        font-size: 10px;
+        font-weight: 700;
+        white-space: nowrap;
+
+        color: var(--text);
+        opacity: 0.7;
+      }
+
+      .legend {
+        position: absolute;
+        left: 5%;
+        bottom: 5%;
+        display: flex;
+        align-items: center;
+        gap: 18px;
+
+        font-size: 12px;
+        opacity: 0.62;
+      }
+
+      .dot {
+        width: 10px;
+        height: 10px;
+        display: inline-block;
+        margin-right: 5px;
+
+        background: var(--green);
+        border-radius: 50%;
+      }
+
+      .star-legend {
+        font-size: 16px;
+        color: var(--green);
+      }
+
+      .note {
+        padding: 14px 18px;
+
+        font-size: 13px;
+        line-height: 1.5;
+
+        background: var(--green-soft);
+        border-radius: 16px;
+      }
+
+      @media (max-width: 900px) {
+        .topbar {
+          flex-direction: column;
+        }
+        .actions {
+          width: 100%;
+          flex-direction: row;
+          flex-wrap: wrap;
+        }
+        .start-summary {
+          grid-template-columns: 1fr;
+        }
+      }
+
+      @media (max-width: 800px) {
+        .page {
+          padding: 14px;
+        }
+        .board {
+          aspect-ratio: 9/14;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <main class="page">
+      <div class="shell">
+        <section class="topbar">
+          <div class="team-copy">
+            <div class="eyebrow">Команда развития</div>
+            <h1 id="teamTitle">Загрузка...</h1>
+
+            <div class="team-meta">
+              <p class="meta-line">
+                <strong>Наша цель:</strong>
+                <span id="teamGoal" class="placeholder-text"
+                  >Текст появится после заполнения Стартовой карты</span
+                >
+              </p>
+              <p class="meta-line">
+                <strong>Состав команды:</strong>
+                <span id="teamMembers" class="placeholder-text"
+                  >Текст появится после заполнения Стартовой карты</span
+                >
+              </p>
+            </div>
+          </div>
+
+          <div class="actions">
+            <a class="action-link diary" href="team_diary_prototype.html"
+              >🔒 Наш дневник</a
+            >
+
+            <div id="surveyActions" class="survey-actions"></div>
+          </div>
+        </section>
+
+        <section class="start-summary">
+          <article class="summary-card">
+            <h2>Наши сильные стороны</h2>
+            <div id="strengthsList" class="chips"></div>
+          </article>
+
+          <article class="summary-card">
+            <h2>Болевые точки</h2>
+            <div id="painsList" class="chips"></div>
+          </article>
+
+          <article class="summary-card">
+            <h2>Ожидания и страхи</h2>
+            <div class="expectations-grid">
+              <div class="expectation-block">
+                <strong>Наши ожидания</strong>
+                <span id="expectationsText" class="placeholder-text"
+                  >Текст появится после заполнения Стартовой карты</span
+                >
+              </div>
+              <div class="expectation-block">
+                <strong>Чего мы опасаемся</strong>
+                <span id="fearsText" class="placeholder-text"
+                  >Текст появится после заполнения Стартовой карты</span
+                >
+              </div>
+            </div>
+          </article>
+        </section>
+
+        <section class="board">
+          <div class="board-title">
+            <h2>Наш путь</h2>
+            <p>
+              Карта будет наполняться по мере прохождения программы · ⭐ —
+              запись в дневнике
+            </p>
+          </div>
+
+          <svg
+            class="route"
+            viewBox="0 0 1400 788"
+            preserveAspectRatio="xMidYMid meet"
+          >
+            <defs>
+              <clipPath id="progressClip">
+                <rect
+                  id="progressClipRect"
+                  x="0"
+                  y="0"
+                  width="0"
+                  height="788"
+                ></rect>
+              </clipPath>
+            </defs>
+            <path
+              class="route-base"
+              d="M95 540 C205 465 270 470 360 525 C455 585 520 570 605 500 C700 420 770 415 855 470 C955 535 1025 510 1100 430 C1175 350 1235 325 1305 300"
+            />
+            <path
+              class="route-progress"
+              clip-path="url(#progressClip)"
+              d="M95 540 C205 465 270 470 360 525 C455 585 520 570 605 500 C700 420 770 415 855 470 C955 535 1025 510 1100 430 C1175 350 1235 325 1305 300"
+            />
+          </svg>
+
+          <div class="checkpoint" style="left: 16%; top: 61%">
+            <div class="picture">
+              <span class="mono">🌱</span><span class="color">🌱</span>
+            </div>
+            <div class="label">Старт</div>
+          </div>
+
+          <div class="checkpoint" style="left: 29%; top: 68%">
+            <div class="picture">
+              <span class="mono">🧩</span><span class="color">🧩</span>
+            </div>
+            <div class="label">Чекпоинт 4</div>
+          </div>
+
+          <div class="checkpoint" style="left: 55%; top: 48%">
+            <div class="picture">
+              <span class="mono">✨</span><span class="color">✨</span>
+            </div>
+            <div class="label">Чекпоинт 10</div>
+          </div>
+
+          <div class="checkpoint" style="left: 69%; top: 61%">
+            <div class="picture">
+              <span class="mono">🧍</span><span class="color">🧍</span>
+            </div>
+            <div class="label">Чекпоинт 14</div>
+          </div>
+
+          <div class="checkpoint" style="left: 90%; top: 38%">
+            <div class="picture">
+              <span class="mono">🪁</span><span class="color">🪁</span>
+            </div>
+            <div class="label">Финальный этап</div>
+          </div>
+
+          <div class="reflection-star active" style="left: 22%; top: 43%">
+            ★
+          </div>
+          <div class="reflection-star active" style="left: 43%; top: 78%">
+            ★
+          </div>
+          <div class="reflection-star active" style="left: 63%; top: 34%">
+            ★
+          </div>
+          <div class="reflection-star" style="left: 80%; top: 70%">★</div>
+
+          <div class="legend">
+            <span><span class="dot"></span>пройдено</span>
+            <span><span class="star-legend">★</span> дневник заполнен</span>
+          </div>
+        </section>
+
+        <div class="note">
+          Сейчас показано стартовое состояние до заполнения Стартовой карты.
+          После заполнения серые маски автоматически заменятся реальными
+          ответами из Start_Map_View/API по team_id.
+        </div>
+      </div>
+    </main>
+
+    <script>
+      /* =========================================================
+   ТЕСТОВЫЕ ДАННЫЕ
+   Потом этот объект заменит ответ API.
+   ========================================================= */
+      /* =========================================================
+   ДАННЫЕ ИЗ APPS SCRIPT API
+   ========================================================= */
+
+      const API_URL =
+        "https://script.google.com/macros/s/AKfycbwvo20hYq9BOZOmi_dmhT55mdpgRrsPJ1CVy0UkisnoDYTF5jOL7ZOyBr99UXLE42Kp/exec";
+
+      function getTeamIdFromUrl() {
+        const params = new URLSearchParams(window.location.search);
+
+        return cleanText(params.get("team_id"));
+      }
+
+      async function loadTeamData() {
+        const teamId = getTeamIdFromUrl();
+
+        if (!teamId) {
+          console.error("В URL не указан team_id");
+
+          return;
+        }
+
+        const url = `${API_URL}?team_id=${encodeURIComponent(teamId)}`;
+
+        try {
+          const response = await fetch(url);
+
+          if (!response.ok) {
+            throw new Error(`HTTP ${response.status}`);
+          }
+
+          const data = await response.json();
+
+          if (!data.success) {
+            throw new Error("API вернул success: false");
+          }
+
+          renderMain(data);
+        } catch (error) {
+          console.error("Ошибка загрузки данных команды:", error);
+        }
+      }
+
+      /* =========================================================
+   RENDER HELPERS
+   ========================================================= */
+      function cleanText(value) {
+        if (value === null || value === undefined) return "";
+        return String(value).trim();
+      }
+
+      function setTextOrPlaceholder(elementId, value) {
+        const element = document.getElementById(elementId);
+        const text = cleanText(value);
+
+        if (text) {
+          element.textContent = text;
+          element.classList.remove("placeholder-text");
+          return;
+        }
+
+        element.textContent = "Текст появится после заполнения Стартовой карты";
+        element.classList.add("placeholder-text");
+      }
+
+      function renderChips(containerId, items) {
+        const container = document.getElementById(containerId);
+        const values = (items || [])
+          .map((item) => cleanText(item.text))
+          .filter(Boolean);
+
+        container.innerHTML = "";
+
+        if (!values.length) {
+          const empty = document.createElement("span");
+          empty.className = "chip placeholder";
+          empty.textContent = "Текст появится после заполнения Стартовой карты";
+          container.appendChild(empty);
+          return;
+        }
+
+        values.forEach((text) => {
+          const chip = document.createElement("span");
+          chip.className = "chip";
+          chip.textContent = text;
+          container.appendChild(chip);
+        });
+      }
+
+      function renderMain(data) {
+        const team = data.team || {};
+        const start = data.start_map || {};
+
+        /* Название: ответ стартовой карты имеет приоритет,
+     иначе остаётся официальное название школы из Team_Map. */
+        document.getElementById("teamTitle").textContent =
+          cleanText(start.team_display_name) ||
+          cleanText(team.school_name) ||
+          "Команда";
+
+        setTextOrPlaceholder("teamGoal", start.goal);
+        setTextOrPlaceholder("teamMembers", start.team_members);
+
+        renderChips("strengthsList", start.strengths);
+        renderChips("painsList", start.pains);
+
+        setTextOrPlaceholder("expectationsText", start.expectations);
+        setTextOrPlaceholder("fearsText", start.fears);
+
+        renderSurveyActions(data.actions || []);
+      }
+
+      function renderSurveyActions(actions) {
+        const container = document.getElementById("surveyActions");
+        container.innerHTML = "";
+
+        (actions || []).forEach((action) => {
+          const title = cleanText(action.title);
+          const url = cleanText(action.url);
+
+          if (!title || !url) {
+            return;
+          }
+
+          const link = document.createElement("a");
+          link.className = "action-link survey";
+          link.href = url;
+          link.textContent = title;
+          link.target = "_blank";
+          link.rel = "noopener noreferrer";
+          link.dataset.actionKey = cleanText(action.key);
+
+          container.appendChild(link);
+        });
+      }
+
+      loadTeamData();
+
+      /* =========================================================
+   СТАРАЯ ДЕМО-АНИМАЦИЯ КАРТЫ
+   ========================================================= */
+      const clipRect = document.getElementById("progressClipRect");
+      const checkpoints = document.querySelectorAll(".checkpoint");
+      const DURATION = 5200;
+      const PROGRESS = 72;
+
+      function animateProgress(p) {
+        clipRect.setAttribute("width", (1400 * p) / 100);
+        checkpoints.forEach((item) => {
+          const t = parseFloat(item.style.left);
+          if (p >= t) {
+            setTimeout(
+              () => item.classList.add("active"),
+              Math.round((t / p) * DURATION),
+            );
+          }
+        });
+      }
+
+      clipRect.setAttribute("width", 0);
+      checkpoints.forEach((item) => item.classList.remove("active"));
+      setTimeout(() => animateProgress(PROGRESS), 450);
+    </script>
+  </body>
+</html>
