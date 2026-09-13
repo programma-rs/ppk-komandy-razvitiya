@@ -1158,8 +1158,15 @@
         document.title = `Наш дневник — ${formatTeamId(TEAM_ID)}`;
 
         try {
+          // const response = await fetchWithOneRetry(
+          //   `${API_URL}?team_id=${encodeURIComponent(TEAM_ID)}`,
+          //   { cache: "no-store" },
+          // );
+
+          const token = sessionStorage.getItem(DIARY_SESSION_KEY);
+
           const response = await fetchWithOneRetry(
-            `${API_URL}?team_id=${encodeURIComponent(TEAM_ID)}`,
+            `${API_URL}?team_id=${encodeURIComponent(TEAM_ID)}&view=diary&token=${encodeURIComponent(token || "")}`,
             { cache: "no-store" },
           );
           if (!response.ok) throw new Error(`HTTP ${response.status}`);
