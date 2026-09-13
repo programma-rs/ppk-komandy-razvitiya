@@ -3,6 +3,7 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width,initial-scale=1.0" />
+    <meta name="robots" content="noindex, nofollow, noarchive" />
     <title>Наш дневник — Команда развития</title>
     <style>
       :root {
@@ -333,6 +334,119 @@
       .start-goal {
         display: none;
       }
+      .auth-screen {
+        min-height: 100vh;
+        display: grid;
+        place-items: center;
+        padding: 24px;
+        background: var(--bg);
+      }
+      .auth-screen[hidden] {
+        display: none;
+      }
+
+      .auth-card {
+        width: min(460px, 100%);
+        padding: 32px;
+        border-radius: 24px;
+        background: var(--paper);
+        border: 1px solid var(--border);
+        box-shadow: 0 16px 40px #28372d18;
+      }
+
+      .auth-label {
+        margin-bottom: 8px;
+        font-size: 12px;
+        font-weight: 800;
+        text-transform: uppercase;
+        letter-spacing: 0.12em;
+        color: var(--green2);
+      }
+
+      .auth-title {
+        margin: 0 0 12px;
+        font-size: 36px;
+        color: var(--green);
+      }
+
+      .auth-text {
+        margin: 0 0 20px;
+        line-height: 1.5;
+        color: var(--muted);
+      }
+
+      .auth-form {
+        display: grid;
+        gap: 12px;
+      }
+
+      .auth-form[hidden] {
+        display: none;
+      }
+
+      .auth-input {
+        width: 100%;
+        padding: 14px 16px;
+        border: 1px solid var(--border);
+        border-radius: 12px;
+        font: inherit;
+        color: var(--text);
+        background: #fff;
+      }
+
+      .auth-input:focus {
+        outline: 2px solid #4f9b7240;
+        border-color: var(--green2);
+      }
+
+      .auth-button {
+        padding: 14px 18px;
+        border: 0;
+        border-radius: 12px;
+        font: inherit;
+        font-weight: 800;
+        color: #fff;
+        background: var(--green);
+        cursor: pointer;
+      }
+
+      .auth-button:disabled {
+        opacity: 0.6;
+        cursor: wait;
+      }
+
+      .auth-error {
+        margin-top: 14px;
+        padding: 12px;
+        border-radius: 10px;
+        color: #8b2e2e;
+        background: #fff0ee;
+      }
+
+      .auth-help {
+        margin: 20px 0 0;
+        font-size: 13px;
+        line-height: 1.5;
+        color: var(--muted);
+      }
+
+      .auth-help a {
+        color: var(--green);
+        font-weight: 700;
+      }
+
+      .auth-back {
+        display: inline-block;
+        margin-top: 16px;
+        font-size: 13px;
+        font-weight: 700;
+        color: var(--green);
+        text-decoration: none;
+      }
+
+      .auth-back:hover {
+        text-decoration: underline;
+      }
 
       @media (max-width: 800px) {
         .page {
@@ -356,7 +470,43 @@
     </style>
   </head>
   <body>
-    <main class="page">
+    <div class="auth-screen" id="authScreen">
+      <div class="auth-card">
+        <div class="auth-label">Закрытый раздел команды</div>
+
+        <h1 class="auth-title" id="authTitle">Наш дневник</h1>
+
+        <p class="auth-text" id="authText">Проверяем доступ…</p>
+
+        <form class="auth-form" id="authForm" hidden>
+          <input
+            class="auth-input"
+            id="authPassword"
+            type="password"
+            autocomplete="current-password"
+            placeholder="Пароль"
+            minlength="8"
+            required
+          />
+
+          <button class="auth-button" type="submit" id="authButton">
+            Войти
+          </button>
+        </form>
+
+        <div class="auth-error" id="authError" hidden></div>
+        <p class="auth-help" id="authHelp" hidden>
+          Забыли пароль? Напишите нам на
+          <a href="mailto:rlp-courses@mgpu.ru">rlp-courses@mgpu.ru</a>. Мы
+          сбросим пароль, после чего вы сможете установить новый.
+        </p>
+
+        <a class="auth-back" id="authBackToMain" href="#">
+          ← Вернуться на главную команды
+        </a>
+      </div>
+    </div>
+    <main class="page" id="diaryPage" hidden>
       <div class="shell">
         <section class="hero">
           <div>
@@ -373,7 +523,7 @@
               rel="noopener"
               hidden
               >Добавить запись в дневник →</a
-            ><a class="back" href="team_main_prototype.html">← На главную</a>
+            ><a class="back" id="backToMain" href="#">← На главную</a>
           </div>
         </section>
 
@@ -439,11 +589,188 @@
       const API_URL =
         "https://script.google.com/macros/s/AKfycbwvo20hYq9BOZOmi_dmhT55mdpgRrsPJ1CVy0UkisnoDYTF5jOL7ZOyBr99UXLE42Kp/exec";
 
-      // Для теста по умолчанию открывается 171-я команда.
       // Позже тот же файл можно использовать для любой команды:
       // team_diary_live.html?team_id=Team_28_Kaliningrad
       const params = new URLSearchParams(window.location.search);
-      const TEAM_ID = params.get("team_id") || "Team_171_SPb";
+      const TEAM_ID = String(params.get("team_id") || "").trim();
+
+      const DIARY_SESSION_KEY = `diary_session_${TEAM_ID}`;
+      let lastDiaryDataLoad = 0;
+
+      const DIARY_DATA_REFRESH_COOLDOWN = 5 * 1000;
+
+      async function postDiaryAccess(action, password) {
+        const response = await fetch(API_URL, {
+          method: "POST",
+
+          headers: {
+            "Content-Type": "text/plain;charset=utf-8",
+          },
+
+          body: JSON.stringify({
+            action: action,
+            team_id: TEAM_ID,
+            password: password,
+          }),
+        });
+
+        if (!response.ok) {
+          throw new Error(`HTTP ${response.status}`);
+        }
+
+        return response.json();
+      }
+
+      function openDiary(token) {
+        if (token) {
+          sessionStorage.setItem(DIARY_SESSION_KEY, token);
+        }
+
+        document.getElementById("authScreen").hidden = true;
+
+        document.getElementById("diaryPage").hidden = false;
+
+        window.scrollTo({
+          top: 0,
+          left: 0,
+        });
+
+        loadDiary();
+      }
+
+      async function startDiaryAccess() {
+        const authText = document.getElementById("authText");
+
+        const authForm = document.getElementById("authForm");
+
+        const authPassword = document.getElementById("authPassword");
+
+        const authButton = document.getElementById("authButton");
+
+        const authError = document.getElementById("authError");
+
+        const authHelp = document.getElementById("authHelp");
+
+        if (!TEAM_ID) {
+          authText.textContent = "В ссылке не указан team_id.";
+
+          return;
+        }
+        const savedToken = sessionStorage.getItem(DIARY_SESSION_KEY);
+
+        if (savedToken) {
+          try {
+            const sessionResponse = await fetch(
+              `${API_URL}?team_id=${encodeURIComponent(TEAM_ID)}&view=diary_session_check&token=${encodeURIComponent(savedToken)}`,
+              {
+                cache: "no-store",
+              },
+            );
+
+            if (!sessionResponse.ok) {
+              throw new Error(`HTTP ${sessionResponse.status}`);
+            }
+
+            const sessionStatus = await sessionResponse.json();
+
+            const returnedTeamId = String(sessionStatus.team_id || "").trim();
+
+            if (returnedTeamId !== TEAM_ID) {
+              throw new Error(
+                `Несовпадение team_id: запрошен ${TEAM_ID}, получен ${returnedTeamId || "пустой"}`,
+              );
+            }
+
+            if (sessionStatus.session_valid) {
+              openDiary(savedToken);
+              return;
+            }
+
+            sessionStorage.removeItem(DIARY_SESSION_KEY);
+          } catch (error) {
+            console.error("Не удалось проверить сохранённую сессию:", error);
+
+            sessionStorage.removeItem(DIARY_SESSION_KEY);
+          }
+        }
+
+        try {
+          const response = await fetch(
+            `${API_URL}?team_id=${encodeURIComponent(TEAM_ID)}&view=diary_access`,
+            {
+              cache: "no-store",
+            },
+          );
+
+          if (!response.ok) {
+            throw new Error(`HTTP ${response.status}`);
+          }
+
+          const status = await response.json();
+
+          if (!status.success) {
+            throw new Error(status.error || "Не удалось проверить доступ.");
+          }
+
+          const needsSetup = Boolean(status.needs_setup);
+          authHelp.hidden = needsSetup;
+
+          authText.textContent = needsSetup
+            ? "При первом входе создайте пароль команды. Он понадобится для следующих посещений дневника."
+            : "Введите пароль команды, чтобы открыть дневник.";
+
+          authPassword.placeholder = needsSetup
+            ? "Придумайте пароль — минимум 8 символов"
+            : "Введите пароль";
+
+          authButton.textContent = needsSetup
+            ? "Создать пароль и войти"
+            : "Войти";
+
+          authForm.hidden = false;
+
+          authForm.addEventListener("submit", async (event) => {
+            event.preventDefault();
+
+            authError.hidden = true;
+
+            const normalButtonText = authButton.textContent;
+
+            authButton.disabled = true;
+            authButton.textContent = "Проверяем пароль…";
+
+            try {
+              const password = authPassword.value;
+
+              const result = await postDiaryAccess(
+                needsSetup ? "diary_setup" : "diary_login",
+                password,
+              );
+
+              if (!result.success) {
+                throw new Error(result.error || "Не удалось войти.");
+              }
+
+              openDiary(result.token);
+            } catch (error) {
+              authError.textContent = error.message;
+
+              authError.hidden = false;
+            } finally {
+              authButton.disabled = false;
+              authButton.textContent = normalButtonText;
+            }
+          });
+        } catch (error) {
+          console.error(error);
+
+          authText.textContent = "Не удалось проверить доступ к дневнику.";
+
+          authError.textContent = error.message;
+
+          authError.hidden = false;
+        }
+      }
 
       function formatTeamId(teamId) {
         return teamId.replaceAll("_", " ");
@@ -796,19 +1123,55 @@
         });
       }
 
+      async function fetchWithOneRetry(url, options = {}) {
+        let response = await fetch(url, options);
+
+        const shouldRetry = response.status === 404 || response.status >= 500;
+
+        if (!shouldRetry) {
+          return response;
+        }
+
+        await new Promise((resolve) => setTimeout(resolve, 1000));
+
+        response = await fetch(url, options);
+
+        return response;
+      }
+
       async function loadDiary() {
+        if (!TEAM_ID) {
+          document.getElementById("teamIntro").textContent =
+            "Не удалось определить команду.";
+
+          document.getElementById("entries").innerHTML =
+            '<div class="status error">В ссылке не указан team_id.</div>';
+
+          document.getElementById("temperatureSection").style.display = "none";
+
+          return;
+        }
+
         document.getElementById("teamIntro").textContent =
           `${formatTeamId(TEAM_ID)}. Здесь собраны рефлексии и динамика командной «температуры».`;
+
         document.title = `Наш дневник — ${formatTeamId(TEAM_ID)}`;
 
         try {
-          const response = await fetch(
+          const response = await fetchWithOneRetry(
             `${API_URL}?team_id=${encodeURIComponent(TEAM_ID)}`,
             { cache: "no-store" },
           );
           if (!response.ok) throw new Error(`HTTP ${response.status}`);
           const data = await response.json();
           if (!data.success) throw new Error(data.error || "API вернул ошибку");
+          const returnedTeamId = String(data.team_id || "").trim();
+
+          if (returnedTeamId !== TEAM_ID) {
+            throw new Error(
+              `Несовпадение team_id: запрошен ${TEAM_ID}, получен ${returnedTeamId || "пустой"}`,
+            );
+          }
 
           const fields = Array.isArray(data.fields) ? data.fields : [];
           const entries = Array.isArray(data.entries) ? data.entries : [];
@@ -836,6 +1199,7 @@
 
           renderTemperature(fields, entries);
           renderEntries(history);
+          lastDiaryDataLoad = Date.now();
         } catch (error) {
           console.error(error);
           document.getElementById("entries").innerHTML =
@@ -843,7 +1207,40 @@
         }
       }
 
-      loadDiary();
+      function refreshDiaryIfNeeded() {
+        const diaryPage = document.getElementById("diaryPage");
+
+        if (diaryPage.hidden) {
+          return;
+        }
+
+        const now = Date.now();
+
+        const timeSinceLastLoad = now - lastDiaryDataLoad;
+
+        if (timeSinceLastLoad < DIARY_DATA_REFRESH_COOLDOWN) {
+          return;
+        }
+
+        loadDiary();
+      }
+
+      document.addEventListener("visibilitychange", () => {
+        if (document.visibilityState === "visible") {
+          refreshDiaryIfNeeded();
+        }
+      });
+
+      window.addEventListener("focus", refreshDiaryIfNeeded);
+
+      if (TEAM_ID) {
+        const mainUrl = `team_main_actions_api_prototype.html?team_id=${encodeURIComponent(TEAM_ID)}`;
+
+        document.getElementById("backToMain").href = mainUrl;
+        document.getElementById("authBackToMain").href = mainUrl;
+      }
+
+      startDiaryAccess();
     </script>
   </body>
 </html>

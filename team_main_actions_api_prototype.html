@@ -3,6 +3,7 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="robots" content="noindex, nofollow, noarchive" />
     <title>Главная страницы команды — Стартовая карта</title>
     <style>
       :root {
@@ -100,58 +101,153 @@
         color: var(--green);
       }
 
+      /* =========================================================
+   КНОПКИ / ПРАВАЯ ПАНЕЛЬ
+   ========================================================= */
+
       .actions {
+        /* Позиционирование / место */
         flex: 0 0 auto;
+
+        /* Layout / устройство */
         display: flex;
         flex-direction: column;
         align-items: stretch;
-        gap: 9px;
-        min-width: 170px;
+        gap: 12px;
+
+        /* Размеры */
+        width: 240px;
       }
 
+      /* =========================================================
+   ОБЩАЯ КНОПКА
+   ========================================================= */
+
       .action-link {
+        /* Layout / устройство */
         display: inline-flex;
         align-items: center;
         justify-content: center;
         gap: 8px;
 
-        min-height: 42px;
-        padding: 10px 14px;
+        /* Размеры */
+        min-height: 40px;
+        padding: 9px 13px;
 
+        /* Типографика */
         font-size: 13px;
         font-weight: 800;
+        text-align: center;
         text-decoration: none;
         white-space: nowrap;
 
-        color: #fff;
-        background: var(--green);
+        /* Внешний вид */
         border-radius: 11px;
       }
 
+      /* =========================================================
+   ДНЕВНИК — ГЛАВНАЯ ПОСТОЯННАЯ КНОПКА
+   ========================================================= */
+
       .action-link.diary {
-        min-height: 44px;
+        /* Размеры */
+        min-height: 42px;
+
+        /* Внешний вид */
+        color: #fff;
+        background: var(--green);
       }
 
-      .survey-actions {
+      /* =========================================================
+   ПОСТОЯННЫЕ ДЕЙСТВИЯ
+   Соглашение + Поделиться с миром
+   ========================================================= */
+
+      .permanent-actions {
+        /* Layout / устройство */
         display: grid;
-        grid-template-columns: 1fr;
+        grid-template-columns: 1fr 1fr;
+        gap: 10px;
+      }
+
+      .action-link.permanent {
+        /* Размеры */
+        min-height: 34px;
+        padding: 7px 9px;
+
+        /* Типографика */
+        font-size: 11px;
+
+        /* Внешний вид */
+        color: var(--green);
+        background: transparent;
+        border: 1px solid #1e6a4a2e;
+      }
+
+      .action-link.permanent:hover {
+        background: var(--green-soft);
+      }
+
+      /* =========================================================
+   ТЕКУЩИЕ ДЕЙСТВИЯ
+   Стартовая карта / Индекс / Итоговая анкета и т. д.
+   ========================================================= */
+
+      .task-actions-wrap {
+        /* Layout / устройство */
+        display: grid;
+        gap: 6px;
+
+        /* Размеры */
+        margin-top: 12px;
+        padding-top: 14px;
+
+        /* Внешний вид */
+        border-top: 1px solid #1e6a4a1f;
+      }
+
+      .task-actions-wrap[hidden] {
+        display: none;
+      }
+      .actions-section-label,
+      .task-actions-label {
+        /* Типографика */
+        font-size: 10px;
+        font-weight: 800;
+        letter-spacing: 0.08em;
+        text-transform: uppercase;
+
+        /* Внешний вид */
+        color: var(--subtle);
+      }
+
+      .task-actions {
+        /* Layout / устройство */
+        display: grid;
         gap: 7px;
       }
 
-      .action-link.survey {
-        min-height: 36px;
-        padding: 8px 12px;
+      .action-link.task {
+        /* Размеры */
+        min-height: 40px;
+        padding: 9px 12px;
 
+        /* Типографика */
         font-size: 12px;
 
-        color: var(--green);
-        background: #f1f0ec;
-        border: 1px solid #1e6a4a24;
+        /* Внешний вид */
+        color: #fff;
+        background: var(--green);
+        border: 1px solid var(--green);
       }
 
-      .action-link.survey:hover {
-        background: var(--green-soft);
+      .action-link.task:hover {
+        opacity: 0.9;
       }
+
+      /* =========================================================
+   СКРЫТЫЕ КНОПКИ
+   ========================================================= */
 
       .action-link[hidden] {
         display: none;
@@ -246,37 +342,276 @@
       }
 
       /* =========================================================
-   КАРТА — пока сохраняем существующий прототип
+   КАРТА — ОСНОВНОЙ КОНТЕЙНЕР
    ========================================================= */
-      .board {
-        position: relative;
-        width: 100%;
-        aspect-ratio: 16/9;
-        overflow: hidden;
 
-        background:
-          radial-gradient(circle at 18% 22%, #ffffffea, transparent 22%),
-          radial-gradient(circle at 80% 70%, #ffffffbd, transparent 20%),
-          var(--paper);
+      .map-zoom-controls {
+        display: flex;
+        justify-content: flex-end;
+        align-items: center;
+        gap: 8px;
+        margin-bottom: 10px;
+      }
+
+      .map-zoom-controls button {
+        width: 34px;
+        height: 34px;
+
+        font: inherit;
+        font-size: 20px;
+        line-height: 1;
+
+        color: var(--green);
+        background: var(--paper);
+
+        border: 1px solid var(--line);
+        border-radius: 10px;
+
+        cursor: pointer;
+      }
+
+      .map-zoom-controls button:hover {
+        background: var(--green-soft);
+      }
+
+      #zoomValue {
+        min-width: 48px;
+        text-align: center;
+
+        font-size: 12px;
+        font-weight: 700;
+        color: var(--subtle);
+      }
+
+      .board {
+        /* позиционирование / место */
+        position: relative;
+
+        /* размеры — вернуть в конце*/
+        /* width: 100%;
+        aspect-ratio: 1400 / 777; */
+
+        /* width: 1400px;
+        height: 777px; */
+
+        width: 100%;
+        max-width: 1400px;
+        aspect-ratio: 1400 / 777;
+        margin: 0 auto;
+
+        /* внешний вид */
+        overflow: hidden;
+        background: var(--paper);
         border-radius: 28px;
         box-shadow: 0 18px 55px #28372d1f;
       }
 
-      .board-title {
+      /* =========================================================
+   КАРТА — СИСТЕМА КООРДИНАТ 1400 × 777
+   ========================================================= */
+
+      .map-canvas {
+        /* позиционирование / место */
         position: absolute;
-        left: 5%;
-        top: 5%;
-        z-index: 4;
+        inset: 0;
+
+        /* размеры */
+        width: 100%;
+        height: 100%;
+
+        /* внешний вид */
+        overflow: hidden;
+
+        transition: transform 0.25s ease;
+        cursor: grab;
+      }
+
+      .map-canvas.is-dragging {
+        cursor: grabbing;
+        transition: none;
+      }
+
+      /* =========================================================
+   КАРТА — ЭЛЕМЕНТЫ ИЗ API
+   ========================================================= */
+
+      .map-element {
+        /* позиционирование / место */
+        position: absolute;
+
+        /* размеры */
+        height: auto;
+
+        /* внешний вид */
+        display: block;
+
+        user-select: none;
+        -webkit-user-drag: none;
+      }
+
+      .map-canvas img {
+        pointer-events: none;
+      }
+
+      /* =========================================================
+   КАРТА — ДАМОЖНО
+   ========================================================= */
+
+      .map-letters {
+        position: absolute;
+        z-index: 40;
+
+        font-size: clamp(14px, 2.4vw, 34px);
+        font-weight: 800;
+        line-height: 1;
+        letter-spacing: 0.06em;
+        white-space: nowrap;
+
+        /* спокойный тёмный цвет старого пергамента */
+        color: #51483a;
+
+        text-shadow:
+          0 1px 0 rgba(255, 248, 228, 0.75),
+          0 2px 4px rgba(66, 53, 37, 0.12);
+      }
+
+      /* ДА + МОЖНО */
+
+      .map-letters .damozhno-letter {
+        display: inline-block;
+
+        background: linear-gradient(
+          110deg,
+          #4f5f3d 0%,
+          #66764a 22%,
+          #87935f 45%,
+          #6f7f52 68%,
+          #9aa476 82%,
+          #4f5f3d 100%
+        );
+
+        background-size: 320% 100%;
+
+        -webkit-background-clip: text;
+        background-clip: text;
+
+        -webkit-text-fill-color: transparent;
+        color: transparent;
+
+        text-shadow: none;
+
+        filter: drop-shadow(0 1px 0 rgba(30, 54, 38, 0.45))
+          drop-shadow(0 2px 2px rgba(30, 54, 38, 0.16));
+
+        opacity: 0;
+        transform: scale(0.45);
+
+        transition:
+          opacity 0.45s ease,
+          transform 0.45s ease;
+      }
+
+      /* появившаяся буква */
+
+      .map-letters .damozhno-letter.visible {
+        opacity: 1;
+        transform: scale(1);
+
+        animation: damozhno-shimmer 9s ease-in-out infinite;
+      }
+
+      /* спокойное бесконечное переливание */
+
+      @keyframes damozhno-shimmer {
+        0% {
+          background-position: 0% 50%;
+        }
+
+        50% {
+          background-position: 100% 50%;
+        }
+
+        100% {
+          background-position: 0% 50%;
+        }
+      }
+
+      .map-letters .phrase-hidden {
+        visibility: hidden;
+      }
+
+      /* =========================================================
+   КАРТА — СЕКЦИЯ
+   ========================================================= */
+
+      .map-section {
+        /* layout / устройство */
+        display: grid;
+
+        /* отступ от блока Стартовой карты */
+        margin-top: 30px;
+      }
+
+      /* =========================================================
+   КАРТА — ВЕРХНИЙ СЛОЙ / ЗВЁЗДЫ
+   ========================================================= */
+
+      .stars-track {
+        /* позиционирование / место */
+        position: relative;
+
+        /* размеры */
+        width: 100%;
+        height: 110px;
+
+        /* внешний вид */
+        overflow: hidden;
+      }
+
+      /* =========================================================
+   КАРТА — НИЖНИЙ СЛОЙ / ЧАШЕЧКИ
+   ========================================================= */
+
+      .tea-track {
+        /* позиционирование / место */
+        position: relative;
+
+        /* layout / устройство */
+        display: flex;
+        align-items: center;
+        gap: 18px;
+
+        /* размеры */
+        width: 100%;
+        min-height: 90px;
+
+        /* внешний вид */
+        overflow: hidden;
+      }
+
+      /* =========================================================
+   КАРТА — ЗАГОЛОВОК
+   ========================================================= */
+
+      .board-title {
+        /* позиционирование / место */
+        position: static;
+
+        /* размеры */
+        padding: 0 6px;
       }
 
       .board-title h2 {
         margin: 0;
+
         font-size: clamp(22px, 3vw, 42px);
       }
 
       .board-title p {
-        margin: 6px 0 0;
+        margin: 6px 0 18px;
+
         font-size: 14px;
+
         opacity: 0.6;
       }
 
@@ -442,6 +777,23 @@
         border-radius: 16px;
       }
 
+      .diary-star {
+        /* внешний вид */
+        font-size: 32px;
+        line-height: 1;
+
+        color: #c8942f;
+      }
+
+      .tea-element {
+        /* размеры */
+        width: 72px;
+        height: auto;
+
+        /* внешний вид */
+        display: block;
+      }
+
       @media (max-width: 900px) {
         .topbar {
           flex-direction: column;
@@ -459,9 +811,6 @@
       @media (max-width: 800px) {
         .page {
           padding: 14px;
-        }
-        .board {
-          aspect-ratio: 9/14;
         }
       }
     </style>
@@ -491,11 +840,28 @@
           </div>
 
           <div class="actions">
-            <a class="action-link diary" href="team_diary_prototype.html"
-              >🔒 Наш дневник</a
-            >
+            <!-- =====================================================
+       ПОСТОЯННАЯ НАВИГАЦИЯ
+       ===================================================== -->
 
-            <div id="surveyActions" class="survey-actions"></div>
+            <div class="actions-section-label">Регулярно ведём</div>
+
+            <a class="action-link diary" id="diaryPageLink" href="#">
+              🔒 Наш дневник
+            </a>
+
+            <div id="permanentActions" class="permanent-actions"></div>
+
+            <!-- =====================================================
+       ТЕКУЩИЕ ДЕЙСТВИЯ КОМАНДЫ
+       Показываются только если есть активная анкета
+       ===================================================== -->
+
+            <div id="taskActionsWrap" class="task-actions-wrap" hidden>
+              <div class="task-actions-label">Сейчас для команды</div>
+
+              <div id="taskActions" class="task-actions"></div>
+            </div>
           </div>
         </section>
 
@@ -529,107 +895,30 @@
           </article>
         </section>
 
-        <section class="board">
+        <section class="map-section">
           <div class="board-title">
             <h2>Наш путь</h2>
-            <p>
-              Карта будет наполняться по мере прохождения программы · ⭐ —
-              запись в дневнике
-            </p>
+            <p>Карта будет наполняться по мере прохождения программы</p>
           </div>
 
-          <svg
-            class="route"
-            viewBox="0 0 1400 788"
-            preserveAspectRatio="xMidYMid meet"
-          >
-            <defs>
-              <clipPath id="progressClip">
-                <rect
-                  id="progressClipRect"
-                  x="0"
-                  y="0"
-                  width="0"
-                  height="788"
-                ></rect>
-              </clipPath>
-            </defs>
-            <path
-              class="route-base"
-              d="M95 540 C205 465 270 470 360 525 C455 585 520 570 605 500 C700 420 770 415 855 470 C955 535 1025 510 1100 430 C1175 350 1235 325 1305 300"
-            />
-            <path
-              class="route-progress"
-              clip-path="url(#progressClip)"
-              d="M95 540 C205 465 270 470 360 525 C455 585 520 570 605 500 C700 420 770 415 855 470 C955 535 1025 510 1100 430 C1175 350 1235 325 1305 300"
-            />
-          </svg>
-
-          <div class="checkpoint" style="left: 16%; top: 61%">
-            <div class="picture">
-              <span class="mono">🌱</span><span class="color">🌱</span>
-            </div>
-            <div class="label">Старт</div>
+          <div class="map-zoom-controls">
+            <button type="button" id="zoomOut" aria-label="Уменьшить карту">
+              −
+            </button>
+            <span id="zoomValue">100%</span>
+            <button type="button" id="zoomIn" aria-label="Увеличить карту">
+              +
+            </button>
           </div>
 
-          <div class="checkpoint" style="left: 29%; top: 68%">
-            <div class="picture">
-              <span class="mono">🧩</span><span class="color">🧩</span>
-            </div>
-            <div class="label">Чекпоинт 4</div>
-          </div>
-
-          <div class="checkpoint" style="left: 55%; top: 48%">
-            <div class="picture">
-              <span class="mono">✨</span><span class="color">✨</span>
-            </div>
-            <div class="label">Чекпоинт 10</div>
-          </div>
-
-          <div class="checkpoint" style="left: 69%; top: 61%">
-            <div class="picture">
-              <span class="mono">🧍</span><span class="color">🧍</span>
-            </div>
-            <div class="label">Чекпоинт 14</div>
-          </div>
-
-          <div class="checkpoint" style="left: 90%; top: 38%">
-            <div class="picture">
-              <span class="mono">🪁</span><span class="color">🪁</span>
-            </div>
-            <div class="label">Финальный этап</div>
-          </div>
-
-          <div class="reflection-star active" style="left: 22%; top: 43%">
-            ★
-          </div>
-          <div class="reflection-star active" style="left: 43%; top: 78%">
-            ★
-          </div>
-          <div class="reflection-star active" style="left: 63%; top: 34%">
-            ★
-          </div>
-          <div class="reflection-star" style="left: 80%; top: 70%">★</div>
-
-          <div class="legend">
-            <span><span class="dot"></span>пройдено</span>
-            <span><span class="star-legend">★</span> дневник заполнен</span>
+          <div class="board">
+            <div id="mapCanvas" class="map-canvas"></div>
           </div>
         </section>
-
-        <div class="note">
-          Сейчас показано стартовое состояние до заполнения Стартовой карты.
-          После заполнения серые маски автоматически заменятся реальными
-          ответами из Start_Map_View/API по team_id.
-        </div>
       </div>
     </main>
 
     <script>
-      /* =========================================================
-   ТЕСТОВЫЕ ДАННЫЕ
-   Потом этот объект заменит ответ API.
-   ========================================================= */
       /* =========================================================
    ДАННЫЕ ИЗ APPS SCRIPT API
    ========================================================= */
@@ -637,14 +926,38 @@
       const API_URL =
         "https://script.google.com/macros/s/AKfycbwvo20hYq9BOZOmi_dmhT55mdpgRrsPJ1CVy0UkisnoDYTF5jOL7ZOyBr99UXLE42Kp/exec";
 
+      let lastTeamDataLoad = 0;
+
+      const TEAM_DATA_REFRESH_COOLDOWN = 5 * 1000;
+
       function getTeamIdFromUrl() {
         const params = new URLSearchParams(window.location.search);
 
         return cleanText(params.get("team_id"));
       }
 
+      async function fetchWithOneRetry(url, options = {}) {
+        let response = await fetch(url, options);
+
+        const shouldRetry = response.status === 404 || response.status >= 500;
+
+        if (!shouldRetry) {
+          return response;
+        }
+
+        await new Promise((resolve) => setTimeout(resolve, 1000));
+
+        response = await fetch(url, options);
+
+        return response;
+      }
+
       async function loadTeamData() {
         const teamId = getTeamIdFromUrl();
+
+        const diaryPageLink = document.getElementById("diaryPageLink");
+
+        diaryPageLink.href = `team_diary_history_ready.html?team_id=${encodeURIComponent(teamId)}`;
 
         if (!teamId) {
           console.error("В URL не указан team_id");
@@ -655,7 +968,7 @@
         const url = `${API_URL}?team_id=${encodeURIComponent(teamId)}`;
 
         try {
-          const response = await fetch(url);
+          const response = await fetchWithOneRetry(url);
 
           if (!response.ok) {
             throw new Error(`HTTP ${response.status}`);
@@ -664,10 +977,20 @@
           const data = await response.json();
 
           if (!data.success) {
-            throw new Error("API вернул success: false");
+            throw new Error(data.error || "API вернул success: false");
+          }
+
+          const returnedTeamId = cleanText(data.team_id);
+
+          if (returnedTeamId !== teamId) {
+            throw new Error(
+              `Несовпадение team_id: запрошен ${teamId}, получен ${returnedTeamId || "пустой"}`,
+            );
           }
 
           renderMain(data);
+
+          lastTeamDataLoad = Date.now();
         } catch (error) {
           console.error("Ошибка загрузки данных команды:", error);
         }
@@ -719,6 +1042,195 @@
         });
       }
 
+      function renderMap(elements) {
+        const container = document.getElementById("mapCanvas");
+
+        if (!container) {
+          return;
+        }
+
+        container.innerHTML = "";
+
+        const MAP_WIDTH = 1400;
+
+        const MAP_HEIGHT = 777;
+
+        (elements || [])
+          .filter((element) => {
+            const type = cleanText(element.type);
+
+            return (
+              element.active === true &&
+              cleanText(element.image_web) &&
+              (type === "background" || type === "scene")
+            );
+          })
+          .forEach((element) => {
+            const image = document.createElement("img");
+
+            image.className = "map-element";
+
+            image.src = cleanText(element.image_web);
+
+            image.alt = "";
+
+            image.addEventListener("error", () => {
+              image.remove();
+            });
+
+            if (element.x_px !== null) {
+              image.style.left = (element.x_px / MAP_WIDTH) * 100 + "%";
+            }
+
+            if (element.y_px !== null) {
+              image.style.top = (element.y_px / MAP_HEIGHT) * 100 + "%";
+            }
+
+            if (element.width_px !== null) {
+              image.style.width = (element.width_px / MAP_WIDTH) * 100 + "%";
+            }
+
+            if (element.z_index !== null) {
+              image.style.zIndex = element.z_index;
+            }
+
+            container.appendChild(image);
+          });
+      }
+      function renderDiaryLetters(elements) {
+        const container = document.getElementById("mapCanvas");
+
+        if (!container) {
+          return;
+        }
+
+        const element = (elements || []).find(
+          (item) => cleanText(item.type) === "letters" && item.active === true,
+        );
+
+        if (!element) {
+          return;
+        }
+
+        const count = Math.max(0, Math.min(7, Number(element.count || 0)));
+
+        if (count === 0) {
+          return;
+        }
+
+        const wrapper = document.createElement("div");
+
+        wrapper.className = "map-letters";
+
+        /*
+    Буквы ДАМОЖНО появляются
+    в случайном порядке,
+    но сразу на своих местах:
+
+    1 — М
+    2 — Д
+    3 — О
+    4 — А
+    5 — Н
+    6 — Ж
+    7 — О
+
+    На 7-й записи проявляется
+    вся фраза:
+    СРЕДА ВОЗМОЖНОСТЕЙ
+  */
+
+        const showFullPhrase = count >= 7;
+
+        wrapper.innerHTML = `
+    <span class="${showFullPhrase ? "" : "phrase-hidden"}">СРЕ</span><span class="damozhno-letter ${count >= 2 ? "visible" : ""}">Д</span><span class="damozhno-letter ${count >= 4 ? "visible" : ""}">А</span>
+    <span class="${showFullPhrase ? "" : "phrase-hidden"}">ВОЗ</span><span class="damozhno-letter ${count >= 1 ? "visible" : ""}">М</span><span class="damozhno-letter ${count >= 3 ? "visible" : ""}">О</span><span class="damozhno-letter ${count >= 6 ? "visible" : ""}">Ж</span><span class="damozhno-letter ${count >= 5 ? "visible" : ""}">Н</span><span class="damozhno-letter ${count >= 7 ? "visible" : ""}">О</span><span class="${showFullPhrase ? "" : "phrase-hidden"}">СТЕЙ</span>
+  `;
+
+        const MAP_WIDTH = 1400;
+        const MAP_HEIGHT = 777;
+
+        const x = element.x_px !== null ? element.x_px : 430;
+
+        const y = element.y_px !== null ? element.y_px : 70;
+
+        wrapper.style.left = (x / MAP_WIDTH) * 100 + "%";
+
+        wrapper.style.top = (y / MAP_HEIGHT) * 100 + "%";
+
+        if (element.width_px !== null) {
+          wrapper.style.width = (element.width_px / MAP_WIDTH) * 100 + "%";
+        }
+
+        if (element.z_index !== null) {
+          wrapper.style.zIndex = element.z_index;
+        }
+
+        container.appendChild(wrapper);
+      }
+
+      function renderStars(elements) {
+        const container = document.getElementById("starsTrack");
+
+        if (!container) {
+          return;
+        }
+
+        container.innerHTML = "";
+
+        const starElements = (elements || []).filter(
+          (element) =>
+            cleanText(element.type) === "star" && element.active === true,
+        );
+
+        starElements.forEach((element) => {
+          const count = Number(element.count || 0);
+
+          for (let i = 0; i < count; i++) {
+            const star = document.createElement("span");
+
+            star.className = "diary-star";
+
+            star.textContent = "★";
+
+            container.appendChild(star);
+          }
+        });
+      }
+
+      function renderTea(elements) {
+        const container = document.getElementById("teaTrack");
+
+        if (!container) {
+          return;
+        }
+
+        container.innerHTML = "";
+
+        (elements || [])
+          .filter(
+            (element) =>
+              cleanText(element.type) === "tea" &&
+              element.active === true &&
+              cleanText(element.image_web),
+          )
+          .forEach((element) => {
+            const image = document.createElement("img");
+
+            image.src = cleanText(element.image_web);
+
+            image.alt = "";
+
+            image.className = "tea-element";
+
+            image.addEventListener("error", () => {
+              image.remove();
+            });
+
+            container.appendChild(image);
+          });
+      }
+
       function renderMain(data) {
         const team = data.team || {};
         const start = data.start_map || {};
@@ -740,58 +1252,191 @@
         setTextOrPlaceholder("fearsText", start.fears);
 
         renderSurveyActions(data.actions || []);
+
+        renderStars(data.map || []);
+
+        renderMap(data.map || []);
+
+        renderDiaryLetters(data.map || []);
+
+        renderTea(data.map || []);
       }
 
       function renderSurveyActions(actions) {
-        const container = document.getElementById("surveyActions");
-        container.innerHTML = "";
+        const permanentContainer = document.getElementById("permanentActions");
+
+        const taskContainer = document.getElementById("taskActions");
+
+        const taskWrap = document.getElementById("taskActionsWrap");
+
+        permanentContainer.innerHTML = "";
+        taskContainer.innerHTML = "";
+
+        /* =====================================================
+     ПОСТОЯННЫЕ ACTION_KEY
+
+     Всё, чего здесь НЕТ, автоматически считается
+     текущим действием команды.
+
+     Поэтому будущие анкеты можно будет добавлять
+     через Settings без переписывания HTML.
+     ===================================================== */
+
+        const permanentKeys = new Set(["agreement", "share_world"]);
 
         (actions || []).forEach((action) => {
           const title = cleanText(action.title);
+
           const url = cleanText(action.url);
 
-          if (!title || !url) {
+          const key = cleanText(action.key);
+
+          if (!title || !url || !key) {
             return;
           }
 
           const link = document.createElement("a");
-          link.className = "action-link survey";
+
           link.href = url;
           link.textContent = title;
+
           link.target = "_blank";
           link.rel = "noopener noreferrer";
-          link.dataset.actionKey = cleanText(action.key);
 
-          container.appendChild(link);
+          link.dataset.actionKey = key;
+
+          /* -----------------------------------------------------
+       Постоянная кнопка
+       ----------------------------------------------------- */
+
+          if (permanentKeys.has(key)) {
+            link.className = "action-link permanent";
+
+            permanentContainer.appendChild(link);
+
+            return;
+          }
+
+          /* -----------------------------------------------------
+       Всё остальное — текущее действие
+       ----------------------------------------------------- */
+
+          link.className = "action-link task";
+
+          taskContainer.appendChild(link);
         });
+
+        /* =====================================================
+     Если текущих действий нет —
+     полностью убираем и заголовок блока
+     ===================================================== */
+
+        taskWrap.hidden = taskContainer.children.length === 0;
       }
+      /* =========================================================
+   ЗУМ И ПЕРЕТАСКИВАНИЕ КАРТЫ
+   ========================================================= */
+
+      const mapCanvas = document.getElementById("mapCanvas");
+      const zoomValue = document.getElementById("zoomValue");
+
+      const zoomLevels = [1, 1.25, 1.5, 1.75, 2];
+
+      let zoomIndex = 0;
+      let panX = 0;
+      let panY = 0;
+
+      let isDragging = false;
+      let dragStartX = 0;
+      let dragStartY = 0;
+
+      function applyMapTransform() {
+        const zoom = zoomLevels[zoomIndex];
+
+        const maxPanX = (mapCanvas.clientWidth * (zoom - 1)) / 2;
+        const maxPanY = (mapCanvas.clientHeight * (zoom - 1)) / 2;
+
+        panX = Math.max(-maxPanX, Math.min(maxPanX, panX));
+        panY = Math.max(-maxPanY, Math.min(maxPanY, panY));
+
+        mapCanvas.style.transform = `translate(${panX}px, ${panY}px) scale(${zoom})`;
+
+        mapCanvas.style.transformOrigin = "center center";
+
+        zoomValue.textContent = `${Math.round(zoom * 100)}%`;
+      }
+
+      document.getElementById("zoomIn").addEventListener("click", () => {
+        if (zoomIndex < zoomLevels.length - 1) {
+          zoomIndex++;
+          applyMapTransform();
+        }
+      });
+
+      document.getElementById("zoomOut").addEventListener("click", () => {
+        if (zoomIndex > 0) {
+          zoomIndex--;
+
+          if (zoomIndex === 0) {
+            panX = 0;
+            panY = 0;
+          }
+
+          applyMapTransform();
+        }
+      });
+
+      mapCanvas.addEventListener("mousedown", (event) => {
+        if (zoomLevels[zoomIndex] === 1) return;
+
+        event.preventDefault();
+
+        isDragging = true;
+
+        dragStartX = event.clientX - panX;
+        dragStartY = event.clientY - panY;
+
+        mapCanvas.classList.add("is-dragging");
+      });
+
+      window.addEventListener("mousemove", (event) => {
+        if (!isDragging) return;
+
+        panX = event.clientX - dragStartX;
+        panY = event.clientY - dragStartY;
+
+        applyMapTransform();
+      });
+
+      function stopDragging() {
+        isDragging = false;
+        mapCanvas.classList.remove("is-dragging");
+      }
+
+      window.addEventListener("mouseup", stopDragging);
+      window.addEventListener("blur", stopDragging);
+
+      function refreshTeamDataIfNeeded() {
+        const now = Date.now();
+
+        const timeSinceLastLoad = now - lastTeamDataLoad;
+
+        if (timeSinceLastLoad < TEAM_DATA_REFRESH_COOLDOWN) {
+          return;
+        }
+
+        loadTeamData();
+      }
+
+      document.addEventListener("visibilitychange", () => {
+        if (document.visibilityState === "visible") {
+          refreshTeamDataIfNeeded();
+        }
+      });
+
+      window.addEventListener("focus", refreshTeamDataIfNeeded);
 
       loadTeamData();
-
-      /* =========================================================
-   СТАРАЯ ДЕМО-АНИМАЦИЯ КАРТЫ
-   ========================================================= */
-      const clipRect = document.getElementById("progressClipRect");
-      const checkpoints = document.querySelectorAll(".checkpoint");
-      const DURATION = 5200;
-      const PROGRESS = 72;
-
-      function animateProgress(p) {
-        clipRect.setAttribute("width", (1400 * p) / 100);
-        checkpoints.forEach((item) => {
-          const t = parseFloat(item.style.left);
-          if (p >= t) {
-            setTimeout(
-              () => item.classList.add("active"),
-              Math.round((t / p) * DURATION),
-            );
-          }
-        });
-      }
-
-      clipRect.setAttribute("width", 0);
-      checkpoints.forEach((item) => item.classList.remove("active"));
-      setTimeout(() => animateProgress(PROGRESS), 450);
     </script>
   </body>
 </html>
