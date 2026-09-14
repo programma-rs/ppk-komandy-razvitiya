@@ -809,6 +809,64 @@
         /* внешний вид */
         display: block;
       }
+
+      /* =========================================================
+   КАРТА — ДОСТИЖЕНИЯ
+   ========================================================= */
+
+      .map-achievements {
+        margin-top: 18px;
+        padding: 18px 20px;
+
+        background: var(--paper);
+        border: 1px solid var(--line);
+        border-radius: 18px;
+      }
+
+      .map-achievements-title {
+        margin-bottom: 12px;
+
+        font-size: 13px;
+        font-weight: 700;
+        color: var(--subtle);
+      }
+
+      .map-achievements-list {
+        column-count: 3;
+        column-gap: 20px;
+      }
+
+      .map-achievement {
+        break-inside: avoid;
+        margin-bottom: 8px;
+
+        font-size: 12px;
+        line-height: 1.4;
+        color: var(--text);
+      }
+
+      .map-achievement-latest {
+        font-weight: 700;
+        color: var(--green);
+      }
+
+      @media (max-width: 1000px) {
+        .map-achievements-list {
+          column-count: 2;
+        }
+      }
+
+      @media (max-width: 650px) {
+        .map-achievements-list {
+          column-count: 1;
+        }
+      }
+
+      /* В служебном режиме печати достижения не показываем */
+      body.print-map-mode .map-achievements {
+        display: none !important;
+      }
+
       @media (max-width: 900px) {
         .topbar {
           flex-direction: column;
@@ -1102,6 +1160,13 @@
 
           <div class="board">
             <div id="mapCanvas" class="map-canvas"></div>
+          </div>
+
+          <div id="mapAchievements" class="map-achievements" hidden>
+            <div class="map-achievements-title">
+              На нашей карте уже появились
+            </div>
+            <div id="mapAchievementsList" class="map-achievements-list"></div>
           </div>
 
           <div class="print-tools">
@@ -1438,6 +1503,42 @@
           });
       }
 
+      function renderAchievements(items) {
+        const container = document.getElementById("mapAchievements");
+        const list = document.getElementById("mapAchievementsList");
+
+        if (!container || !list) {
+          return;
+        }
+
+        list.innerHTML = "";
+
+        const titles = (items || [])
+          .map((item) => cleanText(item.title))
+          .filter(Boolean);
+
+        if (!titles.length || IS_PRINT_MODE) {
+          container.hidden = true;
+          return;
+        }
+
+        titles.forEach((title, index) => {
+          const item = document.createElement("div");
+
+          item.className = "map-achievement";
+
+          if (index >= titles.length - 3) {
+            item.classList.add("map-achievement-latest");
+          }
+
+          item.textContent = title;
+
+          list.appendChild(item);
+        });
+
+        container.hidden = false;
+      }
+
       function renderMain(data) {
         const team = data.team || {};
         const start = data.start_map || {};
@@ -1467,6 +1568,8 @@
         renderDiaryLetters(data.map || []);
 
         renderTea(data.map || []);
+
+        renderAchievements(data.achievements || []);
       }
 
       function renderSurveyActions(actions) {
