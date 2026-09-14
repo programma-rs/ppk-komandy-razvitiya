@@ -541,6 +541,21 @@
         visibility: hidden;
       }
 
+      /* Для экспорта PNG временно отключаем градиент букв */
+      body.exporting-map .map-letters .damozhno-letter {
+        background: none !important;
+        background-image: none !important;
+
+        -webkit-background-clip: initial !important;
+        background-clip: initial !important;
+
+        -webkit-text-fill-color: #6f7f52 !important;
+        color: #6f7f52 !important;
+
+        filter: none !important;
+        animation: none !important;
+      }
+
       /* =========================================================
    КАРТА — СЕКЦИЯ
    ========================================================= */
@@ -904,6 +919,67 @@
         transform: none !important;
         cursor: default;
       }
+
+      .print-tools {
+        display: none;
+      }
+
+      body.print-map-mode .print-tools {
+        display: flex;
+        justify-content: center;
+        margin: 18px 0 30px;
+      }
+
+      #printMapBtn,
+      #downloadMapBtn {
+        padding: 11px 18px;
+
+        font: inherit;
+        font-size: 14px;
+        font-weight: 700;
+
+        color: #fff;
+        background: var(--green);
+
+        border: 0;
+        border-radius: 10px;
+
+        cursor: pointer;
+      }
+
+      @media print {
+        .print-tools {
+          display: none !important;
+        }
+      }
+
+      @media print {
+        @page {
+          size: A3 landscape;
+          margin: 0;
+        }
+
+        html,
+        body {
+          margin: 0 !important;
+          padding: 0 !important;
+        }
+
+        body.print-map-mode .page,
+        body.print-map-mode .shell,
+        body.print-map-mode .map-section {
+          margin: 0 !important;
+          padding: 0 !important;
+          width: 100% !important;
+          max-width: none !important;
+        }
+
+        body.print-map-mode .board {
+          width: 100vw !important;
+          max-width: none !important;
+          margin: 0 !important;
+        }
+      }
     </style>
   </head>
   <body>
@@ -1005,9 +1081,14 @@
           <div class="board">
             <div id="mapCanvas" class="map-canvas"></div>
           </div>
+
+          <div class="print-tools">
+            <button type="button" id="downloadMapBtn">Скачать карту PNG</button>
+          </div>
         </section>
       </div>
     </main>
+    <script src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js"></script>
 
     <script>
       /* =========================================================
@@ -1157,9 +1238,13 @@
           .filter((element) => {
             const type = cleanText(element.type);
 
+            const hasImage = IS_PRINT_MODE
+              ? cleanText(element.image_print) || cleanText(element.image_web)
+              : cleanText(element.image_web);
+
             return (
               element.active === true &&
-              cleanText(element.image_web) &&
+              hasImage &&
               (type === "background" || type === "scene")
             );
           })
@@ -1168,7 +1253,9 @@
 
             image.className = "map-element";
 
-            image.src = cleanText(element.image_web);
+            image.src = IS_PRINT_MODE
+              ? cleanText(element.image_print) || cleanText(element.image_web)
+              : cleanText(element.image_web);
 
             image.alt = "";
 
@@ -1534,6 +1621,78 @@
         });
 
         window.addEventListener("focus", refreshTeamDataIfNeeded);
+      }
+
+      async function downloadMapAsPng() {
+        if (!IS_PRINT_MODE) {
+          return;
+        }
+
+        const board = document.querySelector(".board");
+
+        if (!board) {
+          return;
+        }
+
+        const button = document.getElementById("downloadMapBtn");
+
+        button.disabled = true;
+        button.textContent = "Готовим карту...";
+
+        try {
+          const images = Array.from(board.querySelectorAll("img"));
+
+          await Promise.all(
+            images.map((img) => {
+              if (img.complete && img.naturalWidth > 0) {
+                return Promise.resolve();
+              }
+
+              return new Promise((resolve) => {
+                img.addEventListener("load", resolve, { once: true });
+                img.addEventListener("error", resolve, { once: true });
+              });
+            }),
+          );
+
+          document.body.classList.add("exporting-map");
+
+          /* Даём браузеру один кадр на перерисовку букв */
+          await new Promise((resolve) =>
+            requestAnimationFrame(() => requestAnimationFrame(resolve)),
+          );
+          const canvas = await html2canvas(board, {
+            backgroundColor: null,
+            scale: 2,
+            useCORS: true,
+            allowTaint: false,
+            logging: false,
+          });
+          document.body.classList.remove("exporting-map");
+
+          const teamId = getTeamIdFromUrl() || "team";
+
+          const link = document.createElement("a");
+
+          link.download = `${teamId}_map.png`;
+          link.href = canvas.toDataURL("image/png");
+
+          link.click();
+        } catch (error) {
+          console.error("Ошибка скачивания карты:", error);
+
+          alert("Не удалось собрать карту в PNG. Посмотрите ошибку в консоли.");
+        } finally {
+          document.body.classList.remove("exporting-map");
+          button.disabled = false;
+          button.textContent = "Скачать карту PNG";
+        }
+      }
+
+      const downloadMapBtn = document.getElementById("downloadMapBtn");
+
+      if (downloadMapBtn) {
+        downloadMapBtn.addEventListener("click", downloadMapAsPng);
       }
 
       loadTeamData();
