@@ -462,7 +462,7 @@
         position: absolute;
         z-index: 40;
 
-        font-size: clamp(14px, 2.4vw, 34px);
+        font-size: clamp(12px, 2.4vw, 34px);
         font-weight: 800;
         line-height: 1;
         letter-spacing: 0.06em;
@@ -794,16 +794,22 @@
         /* внешний вид */
         display: block;
       }
-
       @media (max-width: 900px) {
         .topbar {
           flex-direction: column;
         }
+
         .actions {
           width: 100%;
-          flex-direction: row;
-          flex-wrap: wrap;
+          flex-direction: column;
+          align-items: stretch;
         }
+
+        .permanent-actions {
+          width: 100%;
+          grid-template-columns: 1fr 1fr;
+        }
+
         .start-summary {
           grid-template-columns: 1fr;
         }
@@ -813,6 +819,90 @@
         .page {
           padding: 14px;
         }
+
+        /* На мобильных скрываем компьютерный зум карты */
+        .map-zoom-controls {
+          display: none;
+        }
+
+        /* Название команды */
+        .team-copy {
+          width: 100%;
+        }
+
+        .eyebrow,
+        #teamTitle {
+          text-align: center;
+        }
+
+        #teamTitle {
+          margin-left: auto;
+          margin-right: auto;
+        }
+
+        /* Цель и состав читаем слева */
+        .team-meta {
+          width: 100%;
+          text-align: left;
+        }
+
+        /* Заголовок карты */
+        .board-title {
+          width: 100%;
+          padding: 0;
+          text-align: center;
+        }
+
+        .board-title h2,
+        .board-title p {
+          text-align: center;
+        }
+      }
+
+      /* =========================================================
+   ОТДЕЛЬНЫЙ РЕЖИМ КАРТЫ ДЛЯ ПЕЧАТИ
+   ?print=1
+   ========================================================= */
+
+      body.print-map-mode {
+        background: #fff;
+      }
+
+      body.print-map-mode .page {
+        padding: 0;
+      }
+
+      body.print-map-mode .shell {
+        width: 100%;
+        max-width: none;
+        margin: 0;
+        display: block;
+      }
+
+      body.print-map-mode .topbar,
+      body.print-map-mode .start-summary,
+      body.print-map-mode .board-title,
+      body.print-map-mode .map-zoom-controls {
+        display: none !important;
+      }
+
+      body.print-map-mode .map-section {
+        display: block;
+        margin: 0;
+      }
+
+      body.print-map-mode .board {
+        width: 100%;
+        max-width: 1400px;
+        margin: 0 auto;
+
+        border-radius: 0;
+        box-shadow: none;
+      }
+
+      body.print-map-mode .map-canvas {
+        transform: none !important;
+        cursor: default;
       }
     </style>
   </head>
@@ -930,6 +1020,13 @@
       let lastTeamDataLoad = 0;
 
       const TEAM_DATA_REFRESH_COOLDOWN = 5 * 1000;
+
+      const IS_PRINT_MODE =
+        new URLSearchParams(window.location.search).get("print") === "1";
+
+      if (IS_PRINT_MODE) {
+        document.body.classList.add("print-map-mode");
+      }
 
       function getTeamIdFromUrl() {
         const params = new URLSearchParams(window.location.search);
@@ -1429,13 +1526,15 @@
         loadTeamData();
       }
 
-      document.addEventListener("visibilitychange", () => {
-        if (document.visibilityState === "visible") {
-          refreshTeamDataIfNeeded();
-        }
-      });
+      if (!IS_PRINT_MODE) {
+        document.addEventListener("visibilitychange", () => {
+          if (document.visibilityState === "visible") {
+            refreshTeamDataIfNeeded();
+          }
+        });
 
-      window.addEventListener("focus", refreshTeamDataIfNeeded);
+        window.addEventListener("focus", refreshTeamDataIfNeeded);
+      }
 
       loadTeamData();
     </script>
