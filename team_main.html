@@ -905,21 +905,6 @@
         display: block;
         margin: 0;
       }
-
-      body.print-map-mode .board {
-        width: 100%;
-        max-width: 1400px;
-        margin: 0 auto;
-
-        border-radius: 0;
-        box-shadow: none;
-      }
-
-      body.print-map-mode .map-canvas {
-        transform: none !important;
-        cursor: default;
-      }
-
       .print-tools {
         display: none;
       }
@@ -928,6 +913,43 @@
         display: flex;
         justify-content: center;
         margin: 18px 0 30px;
+      }
+
+      body.print-map-mode .board {
+        width: 100%;
+        max-width: 1400px;
+
+        /* Полная пропорция исходного map-base: 1672 × 940 */
+        aspect-ratio: 1672 / 940;
+
+        margin: 0 auto;
+
+        border-radius: 0;
+        box-shadow: none;
+      }
+
+      body.print-map-mode .map-canvas {
+        /*
+    Координатную область оставляем прежней: 1400 × 777.
+    Поэтому все объекты остаются на своих местах.
+  */
+        top: 0;
+        right: 0;
+        bottom: auto;
+        left: 0;
+
+        width: 100%;
+        height: auto;
+        aspect-ratio: 1400 / 777;
+
+        /*
+    Разрешаем map-base выйти ниже старой области на ~10 px.
+    Внешняя .board уже имеет высоту полного исходника.
+  */
+        overflow: visible;
+
+        transform: none !important;
+        cursor: default;
       }
 
       #printMapBtn,
