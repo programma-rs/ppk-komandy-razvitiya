@@ -1,0 +1,1347 @@
+<!doctype html>
+<html lang="ru">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1.0" />
+    <title>Страница курса</title>
+    <link
+      rel="icon"
+      type="image/webp"
+      href="assets/images/map/web/air-balloon.webp"
+    />
+    <style>
+      :root {
+        --bg: #f5f2eb;
+        --paper: #fffefa;
+        --green: #1e6a4a;
+        --green2: #4f9b72;
+        --text: #26372f;
+        --soft: #f2f6f3;
+        --soft2: #faf9f6;
+        --muted: #8b938f;
+        --muted2: #a2a9a5;
+        --border: #1e6a4a18;
+      }
+      * {
+        box-sizing: border-box;
+      }
+      html {
+        scroll-behavior: smooth;
+      }
+      body {
+        margin: 0;
+        font-family: Arial, sans-serif;
+        background: var(--bg);
+        color: var(--text);
+      }
+      .page {
+        padding: 42px 28px 70px;
+      }
+      .shell {
+        width: min(1400px, 100%);
+        margin: auto;
+        display: grid;
+        gap: 34px;
+      }
+
+      .hero {
+        position: relative;
+        padding: 38px 42px;
+        background: var(--green);
+        color: #fff;
+        border-radius: 28px;
+      }
+
+      .hero-hedgehog {
+        position: absolute;
+        right: 45px;
+        bottom: 18px;
+        width: 310px;
+        height: auto;
+        pointer-events: none;
+      }
+      .hero small {
+        display: block;
+        margin-bottom: 10px;
+        text-transform: uppercase;
+        letter-spacing: 0.13em;
+        opacity: 0.65;
+      }
+      h1 {
+        margin: 0;
+        font-size: clamp(36px, 5vw, 62px);
+        letter-spacing: -0.04em;
+      }
+      .hero p {
+        max-width: 920px;
+        margin: 16px 0 0;
+        font-size: 16px;
+        line-height: 1.6;
+        opacity: 0.9;
+      }
+
+      .anchor-nav {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 10px 24px;
+        margin-top: 24px;
+      }
+      .anchor-nav a {
+        display: inline-flex;
+        align-items: center;
+
+        padding: 4px 0;
+
+        font-size: 12px;
+        font-weight: 700;
+        text-decoration: none;
+
+        color: rgba(255, 255, 255, 0.72);
+
+        transition:
+          color 0.2s ease,
+          opacity 0.2s ease;
+      }
+      .anchor-nav a:hover {
+        color: #fff;
+      }
+
+      .section {
+        padding: 34px 36px 38px;
+        background: var(--paper);
+        border: 1px solid var(--border);
+        border-radius: 24px;
+      }
+      .section-head {
+        display: flex;
+        justify-content: space-between;
+        gap: 28px;
+        align-items: flex-end;
+        margin-bottom: 28px;
+      }
+      .section-kicker {
+        margin-bottom: 8px;
+        font-size: 11px;
+        font-weight: 700;
+        letter-spacing: 0.11em;
+        text-transform: uppercase;
+        color: var(--muted2);
+      }
+      .section h2 {
+        margin: 0;
+        font-size: 44px;
+        font-weight: 700;
+        letter-spacing: -0.02em;
+      }
+      .section-head p {
+        max-width: 640px;
+        margin: 0;
+        font-size: 13px;
+        line-height: 1.55;
+        color: var(--muted);
+        text-align: right;
+      }
+
+      .three {
+        display: grid;
+        grid-template-columns: repeat(2, 1fr);
+        gap: 20px;
+      }
+      .column-wide {
+        grid-column: 1 / -1;
+      }
+      .expectations-columns {
+        display: grid;
+        grid-template-columns: repeat(2, 1fr);
+        gap: 20px;
+      }
+      .column {
+        min-width: 0;
+        padding: 22px;
+        background: var(--soft2);
+        border: 1px solid #00000008;
+        border-radius: 18px;
+      }
+      .column h3 {
+        margin: 0 0 16px;
+        font-size: 17px;
+        font-weight: 700;
+      }
+      .subblock {
+        margin-top: 18px;
+      }
+      .subblock:first-of-type {
+        margin-top: 0;
+      }
+      .subblock strong {
+        display: block;
+        margin-bottom: 9px;
+        font-size: 11px;
+        text-transform: uppercase;
+        letter-spacing: 0.05em;
+        color: #9aa19d;
+      }
+      .chips {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 8px;
+      }
+      .chip {
+        padding: 8px 11px;
+        font-size: 12px;
+        line-height: 1.35;
+        background: #edf3ef;
+        border: 1px solid #1e6a4a10;
+        border-radius: 999px;
+      }
+      .chip.hot {
+        background: #dfece4;
+        font-weight: 700;
+      }
+
+      .cards {
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        gap: 18px;
+      }
+      .accordion {
+        background: #fff;
+        border: 1px solid var(--border);
+        border-radius: 17px;
+        overflow: hidden;
+      }
+      .acc-btn {
+        width: 100%;
+        display: flex;
+        justify-content: space-between;
+        gap: 14px;
+        padding: 18px;
+        border: 0;
+        background: #fff;
+        color: var(--text);
+        font: inherit;
+        text-align: left;
+        cursor: pointer;
+      }
+      .acc-title {
+        font-size: 16px;
+        font-weight: 700;
+        line-height: 1.42;
+      }
+      .acc-meta {
+        display: block;
+        margin-top: 5px;
+        font-size: 12px;
+        font-weight: 400;
+        line-height: 1.4;
+        color: var(--muted);
+      }
+      .plus {
+        flex: 0 0 auto;
+        font-size: 20px;
+        color: var(--muted);
+        transition: 0.2s;
+      }
+      .accordion.open .plus {
+        transform: rotate(45deg);
+      }
+      .panel {
+        height: 0;
+        overflow: hidden;
+        transition: height 0.25s ease;
+      }
+      .panel-inner {
+        padding: 0 18px 18px;
+        font-size: 14px;
+        line-height: 1.6;
+        color: #3f4d46;
+      }
+      .review-item + .review-item {
+        margin-top: 14px;
+        padding-top: 14px;
+        border-top: 1px solid #0000000a;
+      }
+
+      .book-review-text {
+        font-size: 14px;
+        line-height: 1.6;
+      }
+
+      .book-review-text.collapsed {
+        display: -webkit-box;
+        -webkit-line-clamp: 3;
+        -webkit-box-orient: vertical;
+        overflow: hidden;
+      }
+
+      .read-more-btn {
+        display: inline-block;
+        margin-top: 7px;
+        padding: 0;
+        border: 0;
+        background: transparent;
+        color: var(--green);
+        font: inherit;
+        font-size: 12px;
+        font-weight: 700;
+        cursor: pointer;
+      }
+
+      .read-more-btn:hover {
+        text-decoration: underline;
+      }
+
+      .mistake-story-title {
+        margin-bottom: 6px;
+        font-size: 14px;
+        font-weight: 700;
+        line-height: 1.45;
+        color: var(--text);
+      }
+
+      .mistake-story-text {
+        font-size: 13px;
+        line-height: 1.6;
+        color: #56635d;
+      }
+
+      .mistake-story-text.collapsed {
+        display: -webkit-box;
+        -webkit-line-clamp: 3;
+        -webkit-box-orient: vertical;
+        overflow: hidden;
+      }
+
+      .insights {
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        gap: 18px;
+      }
+      .quote {
+        padding: 20px;
+        background: var(--soft2);
+        border: 1px solid #00000008;
+        border-radius: 17px;
+        font-size: 14px;
+        line-height: 1.6;
+      }
+      .quote::before {
+        content: "“";
+        display: block;
+        height: 20px;
+        font-size: 30px;
+        line-height: 1;
+        color: #8aab99;
+        font-weight: 900;
+      }
+
+      .insight-quote-mark {
+        height: 18px;
+        margin-bottom: 2px;
+        font-size: 25px;
+        line-height: 1;
+        font-weight: 900;
+        color: #8aab99;
+      }
+
+      .insight-text {
+        font-size: 14px;
+        line-height: 1.6;
+        color: #3f4d46;
+      }
+
+      .insight-text.collapsed {
+        display: -webkit-box;
+        -webkit-line-clamp: 3;
+        -webkit-box-orient: vertical;
+        overflow: hidden;
+      }
+
+      /* ======================================================
+   ГОЛОС ШКОЛЫ + ОПЫТ ИСПОЛЬЗОВАНИЯ ИНДЕКСА
+   ====================================================== */
+
+      .experience-grid {
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        gap: 18px;
+      }
+
+      .experience-card {
+        min-width: 0;
+        padding: 20px;
+        background: var(--soft2);
+        border: 1px solid #00000008;
+        border-radius: 17px;
+      }
+
+      .experience-text {
+        font-size: 14px;
+        line-height: 1.6;
+        color: #3f4d46;
+        white-space: pre-line;
+      }
+
+      .experience-text.collapsed {
+        display: -webkit-box;
+        -webkit-line-clamp: 3;
+        -webkit-box-orient: vertical;
+        overflow: hidden;
+      }
+
+      .team-tag {
+        display: block;
+        margin-top: 10px;
+        font-size: 11px;
+        font-weight: 600;
+        color: #9aa19d;
+      }
+
+      .future-note {
+        padding: 17px 20px;
+        background: #ffffff9c;
+        border: 1px dashed #1e6a4a2c;
+        border-radius: 16px;
+        font-size: 13px;
+        line-height: 1.5;
+        color: var(--muted);
+      }
+
+      .footer {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 18px;
+        padding: 20px 4px 0;
+        color: var(--muted);
+        font-size: 12px;
+      }
+      .to-top {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        min-height: 38px;
+        padding: 9px 14px;
+        color: var(--green);
+        background: #ffffffb8;
+        border: 1px solid var(--border);
+        border-radius: 12px;
+        text-decoration: none;
+        font-weight: 800;
+      }
+      .to-top:hover {
+        background: #fff;
+      }
+
+      @media (max-width: 1000px) {
+        .three,
+        .cards,
+        .insights {
+          grid-template-columns: 1fr 1fr;
+        }
+      }
+
+      .artifact-head {
+        align-items: center;
+      }
+
+      .section-artifact {
+        display: block;
+        width: 280px;
+        max-width: 28vw;
+        height: auto;
+        object-fit: contain;
+        flex: 0 0 auto;
+      }
+
+      /* Только картинка для блока "На ошибках учимся" */
+      .mistake-artifact {
+        width: 230px;
+        margin-right: 35px;
+      }
+
+      /* Только картинка для блока "Наши инсайты" */
+      .insight-artifact {
+        width: 250px;
+        margin-right: 20px;
+      }
+
+      /* Только картинка для блока "Голос школы" */
+      .voice-artifact {
+        width: 300px;
+        margin-right: 10px;
+      }
+      /* Только картинка для блока "Опыт использования Индекса" */
+      .index-artifact {
+        width: 300px;
+        margin-right: 35px;
+      }
+
+      #index-section .section-head {
+        transform: translateY(-25px);
+        margin-bottom: 3px;
+      }
+
+      /* Только картинка для блока "С чего мы начинаем" */
+      .start-artifact {
+        width: 360px;
+        margin-right: 20px;
+      }
+
+      @media (max-width: 1300px) and (min-width: 761px) {
+        .hero {
+          padding-right: 230px;
+        }
+
+        .hero-hedgehog {
+          width: 210px;
+          right: 20px;
+          bottom: 20px;
+        }
+
+        .hero p {
+          max-width: 720px;
+        }
+      }
+
+      @media (max-width: 760px) {
+        .page {
+          padding: 18px 14px 40px;
+        }
+        .hero {
+          padding: 26px;
+        }
+        .hero {
+          padding: 26px;
+          padding-right: 105px;
+        }
+
+        .hero-hedgehog {
+          width: 105px;
+          right: 10px;
+          top: 18px;
+          bottom: auto;
+        }
+
+        .hero p {
+          max-width: none;
+        }
+
+        .anchor-nav {
+          margin-right: -85px;
+        }
+        .section {
+          padding: 24px 20px;
+        }
+        .section-head {
+          display: block;
+        }
+        .section-head p {
+          margin-top: 10px;
+          text-align: left;
+        }
+
+        .section-artifact {
+          width: 190px;
+          margin: 18px auto 0;
+        }
+        .three,
+        .cards,
+        .insights,
+        .experience-grid,
+        .expectations-columns {
+          grid-template-columns: 1fr;
+        }
+        .column-wide {
+          grid-column: auto;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <main class="page">
+      <div class="shell">
+        <section class="hero" id="top">
+          <img
+            class="hero-hedgehog"
+            src="assets/images/map/web/air-balloon.webp"
+            alt=""
+          />
+          <small
+            >ППК «Команда развития ОО: от исследования к созданию развивающей
+            среды»</small
+          >
+          <h1>Общая страница курса</h1>
+          <p>
+            Общее пространство программы: здесь постепенно собираются сильные
+            стороны команд, опыт, находки, ошибки и выводы, которыми участники
+            решили поделиться.
+          </p>
+
+          <nav class="anchor-nav" aria-label="Навигация по разделам">
+            <a href="#start">Стартовая карта</a>
+            <a href="#books-section">Изба-читальня</a>
+            <a href="#mistakes-section">На ошибках учимся</a>
+            <a href="#insights-section">Наши инсайты</a>
+            <a href="#voice-section">Голос школы</a>
+            <a href="#index-section">Опыт использования Индекса</a>
+          </nav>
+        </section>
+
+        <section class="section" id="start">
+          <div class="section-head artifact-head">
+            <div>
+              <div class="section-kicker">Стартовая карта</div>
+              <h2>С чего мы начинаем</h2>
+            </div>
+
+            <img
+              class="section-artifact start-artifact"
+              src="assets/images/map/web/heroes-together.webp"
+              alt=""
+            />
+          </div>
+
+          <div class="three">
+            <div class="column">
+              <h3>Наши сильные стороны</h3>
+              <div id="strengths" class="chips"></div>
+            </div>
+
+            <div class="column">
+              <h3>Болевые точки</h3>
+              <div id="pains" class="chips"></div>
+            </div>
+
+            <div class="column column-wide">
+              <h3>Ожидания и страхи</h3>
+
+              <div class="expectations-columns">
+                <div class="subblock">
+                  <strong>Наши ожидания</strong>
+                  <div id="expectations" class="chips"></div>
+                </div>
+
+                <div class="subblock">
+                  <strong>Чего мы опасаемся</strong>
+                  <div id="fears" class="chips"></div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <section class="section" id="books-section">
+          <div class="section-head artifact-head">
+            <div>
+              <div class="section-kicker">Делимся с миром</div>
+              <h2>Изба-читальня</h2>
+            </div>
+
+            <img
+              class="section-artifact"
+              src="assets/images/map/web/quest-books-set-2-transparent.webp"
+              alt=""
+            />
+          </div>
+
+          <div id="books" class="cards"></div>
+        </section>
+
+        <section class="section" id="mistakes-section">
+          <div class="section-head artifact-head">
+            <div>
+              <div class="section-kicker">Делимся с миром</div>
+              <h2>На ошибках учимся</h2>
+            </div>
+
+            <img
+              class="section-artifact mistake-artifact"
+              src="assets/images/map/web/rake_holder.webp"
+              alt=""
+            />
+          </div>
+
+          <div id="mistakes" class="cards"></div>
+        </section>
+
+        <section class="section" id="insights-section">
+          <div class="section-head artifact-head">
+            <div>
+              <div class="section-kicker">Делимся с миром</div>
+              <h2>Наши инсайты</h2>
+            </div>
+
+            <img
+              class="section-artifact insight-artifact"
+              src="assets/images/map/web/bouquet.webp"
+              alt=""
+            />
+          </div>
+
+          <div id="insights" class="cards"></div>
+        </section>
+
+        <section class="section" id="voice-section">
+          <div class="section-head artifact-head">
+            <div>
+              <div class="section-kicker">Опыт команд</div>
+              <h2>Голос школы</h2>
+            </div>
+
+            <img
+              class="section-artifact voice-artifact"
+              src="assets/images/map/web/bridge-brown.webp"
+              alt=""
+            />
+          </div>
+
+          <div id="voice" class="experience-grid"></div>
+        </section>
+
+        <section class="section" id="index-section">
+          <div class="section-head artifact-head">
+            <div>
+              <div class="section-kicker">Опыт команд</div>
+              <h2>Опыт использования Индекса</h2>
+            </div>
+
+            <img
+              class="section-artifact index-artifact"
+              src="assets/images/map/web/Moominmamma.webp"
+              alt=""
+            />
+          </div>
+
+          <div id="indexExperience" class="experience-grid"></div>
+        </section>
+
+        <footer class="footer">
+          <span>ППК команды развития · общее пространство курса</span>
+          <a class="to-top" href="#top">↑ Наверх</a>
+        </footer>
+      </div>
+    </main>
+
+    <script>
+      const teams = [
+        "Команда «Маяк»",
+        "Команда «Высота»",
+        "Команда «Север»",
+        "Команда «Импульс»",
+        "Команда «Вектор»",
+        "Команда «Пульс»",
+        "Команда «Смысл»",
+        "Команда «Горизонт»",
+        "Команда «Точка роста»",
+        "Команда «Созвездие»",
+        "Команда «Движение»",
+        "Команда «Парус»",
+        "Команда «Лаборатория идей»",
+        "Команда «Диалог»",
+        "Команда «Компас»",
+        "Команда «Фокус»",
+        "Команда «Среда»",
+        "Команда «Путь»",
+        "Команда «Вместе»",
+        "Команда «Энергия»",
+        "Команда «Открытие»",
+        "Команда «Шаг вперёд»",
+        "Команда «Перемены»",
+      ];
+      // ======================================================
+      // СТАРТОВАЯ КАРТА — ДАННЫЕ ИЗ API
+      // ======================================================
+
+      const API_URL =
+        "https://script.google.com/macros/s/AKfycbwvo20hYq9BOZOmi_dmhT55mdpgRrsPJ1CVy0UkisnoDYTF5jOL7ZOyBr99UXLE42Kp/exec";
+
+      function cleanText(value) {
+        if (value === null || value === undefined) {
+          return "";
+        }
+
+        return String(value).trim();
+      }
+
+      function renderChips(id, arr) {
+        const container = document.getElementById(id);
+
+        if (!container) {
+          return;
+        }
+
+        const values = (arr || []).map(cleanText).filter(Boolean);
+
+        const counts = {};
+
+        values.forEach((text) => {
+          counts[text] = (counts[text] || 0) + 1;
+        });
+
+        container.innerHTML = "";
+
+        Object.keys(counts).forEach((text) => {
+          const chip = document.createElement("span");
+
+          chip.className = counts[text] > 1 ? "chip hot" : "chip";
+
+          chip.textContent =
+            counts[text] > 1 ? `${text} ×${counts[text]}` : text;
+
+          container.appendChild(chip);
+        });
+      }
+
+      async function loadCourseData() {
+        try {
+          const response = await fetch(`${API_URL}?view=course`);
+
+          if (!response.ok) {
+            throw new Error(`HTTP ${response.status}`);
+          }
+
+          const data = await response.json();
+
+          if (!data.success) {
+            throw new Error("API не вернул данные страницы курса");
+          }
+
+          // ======================================================
+          // СТАРТОВАЯ КАРТА
+          // ======================================================
+
+          if (data.start_map) {
+            renderChips("strengths", data.start_map.strengths);
+
+            renderChips("pains", data.start_map.pains);
+
+            renderChips("expectations", data.start_map.expectations);
+
+            renderChips("fears", data.start_map.fears);
+          }
+
+          // ======================================================
+          // ИЗБА-ЧИТАЛЬНЯ
+          // ======================================================
+
+          renderBooks(data.share_world?.books, data.team_names || {});
+          requestAnimationFrame(() => {
+            updateReadMoreButtons();
+          });
+          // ======================================================
+          // НА ОШИБКАХ УЧИМСЯ
+          // ======================================================
+
+          renderMistakes(data.share_world?.mistakes, data.team_names || {});
+
+          requestAnimationFrame(() => {
+            updateReadMoreButtons();
+          });
+
+          // ======================================================
+          // НАШИ ИНСАЙТЫ
+          // ======================================================
+
+          renderInsights(data.share_world?.insights, data.team_names || {});
+          requestAnimationFrame(() => {
+            updateReadMoreButtons();
+          });
+
+          // ======================================================
+          // ГОЛОС ШКОЛЫ
+          // ======================================================
+
+          renderVoiceSchool(data.voice_school, data.team_names || {});
+
+          // ======================================================
+          // ОПЫТ ИСПОЛЬЗОВАНИЯ ИНДЕКСА
+          // ======================================================
+
+          renderIndexExperience(data.index_experience, data.team_names || {});
+
+          requestAnimationFrame(() => {
+            updateReadMoreButtons();
+          });
+        } catch (error) {
+          console.error("Ошибка загрузки страницы курса:", error);
+        }
+      }
+
+      loadCourseData();
+
+      function accordionCard(title, meta, html) {
+        return `<article class="accordion">
+              <button class="acc-btn">
+                <span class="acc-title">${title}<span class="acc-meta">${meta}</span></span>
+                <span class="plus">+</span>
+              </button>
+              <div class="panel"><div class="panel-inner">${html}</div></div>
+            </article>`;
+      }
+
+      function renderMistakes(mistakes, teamNames) {
+        const container = document.getElementById("mistakes");
+
+        if (!container) {
+          return;
+        }
+
+        const items = Array.isArray(mistakes) ? mistakes : [];
+
+        // Одна категория = одна карточка.
+        // Внутри собираем все истории этой категории.
+
+        const groups = new Map();
+
+        items.forEach((item) => {
+          const category = cleanText(item.category);
+
+          if (!category) {
+            return;
+          }
+
+          if (!groups.has(category)) {
+            groups.set(category, {
+              category: category,
+              categoryOptionId: Number(item.category_option_id) || 0,
+              stories: [],
+            });
+          }
+
+          const title = cleanText(item.title);
+
+          const text = cleanText(item.text);
+
+          const teamName = cleanText(teamNames?.[item.team_id]);
+
+          groups.get(category).stories.push({
+            title: title,
+            text: text,
+            teamName: teamName,
+          });
+        });
+
+        const mistakeOrder = [
+          22869609, // Организация процессов
+          22869610, // Время и темп
+          22869611, // Коммуникация
+          22869612, // Саморегуляция
+        ];
+
+        const sortedGroups = Array.from(groups.values()).sort((a, b) => {
+          const aIndex = mistakeOrder.indexOf(a.categoryOptionId);
+          const bIndex = mistakeOrder.indexOf(b.categoryOptionId);
+
+          const aOrder = aIndex === -1 ? mistakeOrder.length : aIndex;
+          const bOrder = bIndex === -1 ? mistakeOrder.length : bIndex;
+
+          return aOrder - bOrder;
+        });
+
+        container.innerHTML = sortedGroups
+          .map((group) => {
+            const storiesHtml = group.stories
+              .map((item) => {
+                const titleHtml = item.title
+                  ? `<div class="mistake-story-title">${item.title}</div>`
+                  : "";
+
+                const textHtml = item.text
+                  ? `
+          <div class="mistake-story-text collapsed">${item.text}</div>
+          <button type="button" class="read-more-btn mistake-read-more">
+            Читать далее
+          </button>
+        `
+                  : "";
+
+                const teamHtml = item.teamName
+                  ? `<span class="team-tag">${item.teamName}</span>`
+                  : "";
+
+                return `
+                          <div class="review-item">
+                            ${titleHtml}
+                            ${textHtml}
+                            ${teamHtml}
+                          </div>
+                        `;
+              })
+              .join("");
+
+            return accordionCard(group.category, "", storiesHtml);
+          })
+          .join("");
+      }
+
+      function renderInsights(insights, teamNames) {
+        const container = document.getElementById("insights");
+
+        if (!container) {
+          return;
+        }
+
+        const items = Array.isArray(insights) ? insights : [];
+
+        // Одна категория = один аккордеон.
+        // Внутри категории собираем все инсайты команд.
+        const groups = new Map();
+
+        items.forEach((item) => {
+          const category = cleanText(item.category);
+          const title = cleanText(item.title);
+          const text = cleanText(item.text);
+
+          if (!category || (!title && !text)) {
+            return;
+          }
+
+          if (!groups.has(category)) {
+            groups.set(category, {
+              category: category,
+              categoryOptionId: Number(item.category_option_id) || 0,
+              insights: [],
+            });
+          }
+
+          const teamName = cleanText(teamNames?.[item.team_id]);
+
+          groups.get(category).insights.push({
+            title: title,
+            text: text,
+            teamName: teamName,
+          });
+        });
+
+        // Сначала четыре категории из анкеты,
+        // затем пользовательские варианты "Другое".
+        const insightOrder = [
+          22869613, // Организация процессов
+          22869614, // Время и темп
+          22869615, // Коммуникация
+          22869616, // Саморегуляция
+        ];
+
+        const sortedGroups = Array.from(groups.values()).sort((a, b) => {
+          const aIndex = insightOrder.indexOf(a.categoryOptionId);
+          const bIndex = insightOrder.indexOf(b.categoryOptionId);
+
+          const aOrder = aIndex === -1 ? insightOrder.length : aIndex;
+          const bOrder = bIndex === -1 ? insightOrder.length : bIndex;
+
+          return aOrder - bOrder;
+        });
+
+        container.innerHTML = sortedGroups
+          .map((group) => {
+            const insightsHtml = group.insights
+              .map((item) => {
+                const teamHtml = item.teamName
+                  ? `<span class="team-tag">${item.teamName}</span>`
+                  : "";
+
+                const titleHtml = item.title
+                  ? `<div class="mistake-story-title">${item.title}</div>`
+                  : "";
+
+                const textHtml = item.text
+                  ? `
+    <div class="insight-text collapsed">${item.text}</div>
+    <button type="button" class="read-more-btn insight-read-more">
+      Читать далее
+    </button>
+  `
+                  : "";
+                return `
+  <div class="review-item insight-item">
+    <div class="insight-quote-mark">“</div>
+    ${titleHtml}
+    ${textHtml}
+    ${teamHtml}
+  </div>
+`;
+              })
+              .join("");
+
+            return accordionCard(group.category, "", insightsHtml);
+          })
+          .join("");
+      }
+
+      function renderBooks(books, teamNames) {
+        const container = document.getElementById("books");
+
+        if (!container) {
+          return;
+        }
+
+        const items = Array.isArray(books) ? books : [];
+
+        // Группируем отправки по названию книги.
+        // Одинаковое название = одна карточка.
+
+        const groups = new Map();
+
+        items.forEach((item) => {
+          const title = cleanText(item.title);
+
+          if (!title) {
+            return;
+          }
+
+          if (!groups.has(title)) {
+            groups.set(title, {
+              title: title,
+              titleOptionId: Number(item.title_option_id) || 0,
+              category: cleanText(item.category),
+              reviews: [],
+            });
+          }
+
+          const group = groups.get(title);
+
+          // Если у первой записи категория была пустая,
+          // а дальше встретилась заполненная — сохраняем её.
+
+          if (!group.category && cleanText(item.category)) {
+            group.category = cleanText(item.category);
+          }
+
+          const review = cleanText(item.review);
+          const teamName = cleanText(teamNames?.[item.team_id]);
+
+          if (review || teamName) {
+            group.reviews.push({
+              review: review,
+              teamName: teamName,
+            });
+          }
+        });
+
+        const bookOrder = [22849767, 22849768, 22849769, 22849771, 22849770];
+
+        const sortedBooks = Array.from(groups.values()).sort((a, b) => {
+          const aIndex = bookOrder.indexOf(a.titleOptionId);
+          const bIndex = bookOrder.indexOf(b.titleOptionId);
+
+          const aOrder = aIndex === -1 ? bookOrder.length : aIndex;
+          const bOrder = bIndex === -1 ? bookOrder.length : bIndex;
+
+          return aOrder - bOrder;
+        });
+
+        container.innerHTML = sortedBooks
+          .map((book) => {
+            const reviewsHtml = book.reviews
+              .map((item) => {
+                const teamHtml = item.teamName
+                  ? `<span class="team-tag">${item.teamName}</span>`
+                  : "";
+
+                const reviewHtml = item.review
+                  ? `
+                  <div class="book-review-text collapsed">${item.review}</div>
+                  <button type="button" class="read-more-btn">Читать далее</button>
+                `
+                  : "";
+
+                return `
+                <div class="review-item">
+                  ${reviewHtml}
+                  ${teamHtml}
+                </div>
+              `;
+              })
+              .join("");
+
+            const meta = book.category || "";
+
+            return accordionCard(book.title, meta, reviewsHtml);
+          })
+          .join("");
+      }
+
+      function updateReadMoreButtons() {
+        document
+          .querySelectorAll(
+            ".book-review-text, .mistake-story-text, .insight-text, .experience-text",
+          )
+          .forEach((review) => {
+            const button = review.nextElementSibling;
+
+            if (!button || !button.classList.contains("read-more-btn")) {
+              return;
+            }
+
+            review.classList.add("collapsed");
+
+            const isOverflowing = review.scrollHeight > review.clientHeight + 1;
+
+            button.style.display = isOverflowing ? "inline-block" : "none";
+          });
+      }
+
+      function renderVoiceSchool(items, teamNames) {
+        const section = document.getElementById("voice-section");
+        const container = document.getElementById("voice");
+        const navLink = document.querySelector('a[href="#voice-section"]');
+
+        if (!section || !container) {
+          return;
+        }
+
+        const responses = (Array.isArray(items) ? items : []).filter((item) =>
+          cleanText(item.text),
+        );
+
+        if (responses.length === 0) {
+          section.style.display = "none";
+
+          if (navLink) {
+            navLink.style.display = "none";
+          }
+
+          container.innerHTML = "";
+          return;
+        }
+
+        section.style.display = "";
+
+        if (navLink) {
+          navLink.style.display = "";
+        }
+
+        container.innerHTML = responses
+          .map((item) => {
+            const text = cleanText(item.text);
+            const teamName = cleanText(teamNames?.[item.team_id]);
+
+            const teamHtml = teamName
+              ? `<span class="team-tag">${teamName}</span>`
+              : "";
+
+            return `
+        <article class="experience-card">
+          <div class="experience-text collapsed">${text}</div>
+          <button type="button" class="read-more-btn">Читать далее</button>
+          ${teamHtml}
+        </article>
+      `;
+          })
+          .join("");
+      }
+
+      function renderIndexExperience(items, teamNames) {
+        const section = document.getElementById("index-section");
+        const container = document.getElementById("indexExperience");
+        const navLink = document.querySelector('a[href="#index-section"]');
+
+        if (!section || !container) {
+          return;
+        }
+
+        const responses = (Array.isArray(items) ? items : []).filter((item) =>
+          cleanText(item.text),
+        );
+
+        if (responses.length === 0) {
+          section.style.display = "none";
+
+          if (navLink) {
+            navLink.style.display = "none";
+          }
+
+          container.innerHTML = "";
+          return;
+        }
+
+        section.style.display = "";
+
+        if (navLink) {
+          navLink.style.display = "";
+        }
+
+        container.innerHTML = responses
+          .map((item) => {
+            const text = cleanText(item.text);
+            const teamName = cleanText(teamNames?.[item.team_id]);
+
+            const teamHtml = teamName
+              ? `<span class="team-tag">${teamName}</span>`
+              : "";
+
+            return `
+        <article class="experience-card">
+          <div class="experience-text collapsed">${text}</div>
+          <button type="button" class="read-more-btn">Читать далее</button>
+          ${teamHtml}
+        </article>
+      `;
+          })
+          .join("");
+      }
+
+      document.addEventListener("click", (event) => {
+        const button = event.target.closest(".read-more-btn");
+
+        if (!button) {
+          return;
+        }
+
+        const review = button.previousElementSibling;
+
+        if (
+          !review ||
+          (!review.classList.contains("book-review-text") &&
+            !review.classList.contains("mistake-story-text") &&
+            !review.classList.contains("insight-text") &&
+            !review.classList.contains("experience-text"))
+        ) {
+          return;
+        }
+
+        const isCollapsed = review.classList.toggle("collapsed");
+
+        button.textContent = isCollapsed ? "Читать далее" : "Свернуть";
+
+        const accordion = button.closest(".accordion");
+
+        if (accordion && accordion.classList.contains("open")) {
+          const panel = accordion.querySelector(".panel");
+          const inner = accordion.querySelector(".panel-inner");
+
+          if (panel && inner) {
+            panel.style.height = inner.scrollHeight + "px";
+          }
+        }
+      });
+
+      document.addEventListener("click", (event) => {
+        const btn = event.target.closest(".acc-btn");
+
+        if (!btn) {
+          return;
+        }
+
+        const item = btn.closest(".accordion");
+
+        if (!item) {
+          return;
+        }
+
+        const panel = item.querySelector(".panel");
+
+        const inner = item.querySelector(".panel-inner");
+
+        if (!panel || !inner) {
+          return;
+        }
+
+        const open = item.classList.toggle("open");
+
+        panel.style.height = open ? inner.scrollHeight + "px" : "0px";
+      });
+    </script>
+  </body>
+</html>
