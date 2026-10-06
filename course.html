@@ -524,6 +524,13 @@
         .hero p {
           max-width: 720px;
         }
+
+        .hero small {
+          font-size: 9px;
+          line-height: 1.6;
+          letter-spacing: 0.1em;
+          white-space: nowrap;
+        }
       }
 
       @media (max-width: 760px) {
@@ -582,6 +589,20 @@
           font-size: clamp(26px, 8vw, 36px);
           line-height: 1.08;
         }
+
+        /* Мобильная версия — шапка */
+        .hero small {
+          font-size: 10px;
+          line-height: 1.55;
+          letter-spacing: 0.16em;
+          max-width: 230px;
+        }
+
+        /* На мобильном отменяем десктопный сдвиг заголовка Индекса */
+        #index-section .section-head {
+          transform: none;
+          margin-bottom: 28px;
+        }
       }
     </style>
   </head>
@@ -595,8 +616,8 @@
             alt=""
           />
           <small
-            >ППК «Команда развития ОО: от исследования к созданию развивающей
-            среды»</small
+            >ППК «Команда развития ОО: от&nbsp;исследования к&nbsp;созданию
+            развивающей среды»</small
           >
           <h1>Общая страница курса</h1>
           <p>
