@@ -407,6 +407,17 @@
         color: var(--muted);
       }
 
+      .empty-note {
+        padding: 17px 20px;
+        background: #ffffff9c;
+        border: 1px dashed #1e6a4a2c;
+        border-radius: 16px;
+        font-size: 13px;
+        line-height: 1.5;
+        color: var(--muted);
+        font-style: italic;
+      }
+
       .footer {
         display: flex;
         align-items: center;
@@ -555,6 +566,11 @@
         .column-wide {
           grid-column: auto;
         }
+
+        .section h2 {
+          font-size: clamp(26px, 8vw, 36px);
+          line-height: 1.08;
+        }
       }
     </style>
   </head>
@@ -602,7 +618,11 @@
             />
           </div>
 
-          <div class="three">
+          <div id="startEmpty" class="empty-note" style="display: none">
+            Текст появится после заполнения командами Стартовой карты
+          </div>
+
+          <div class="three" id="startContent">
             <div class="column">
               <h3>Наши сильные стороны</h3>
               <div id="strengths" class="chips"></div>
@@ -811,14 +831,31 @@
           // СТАРТОВАЯ КАРТА
           // ======================================================
 
-          if (data.start_map) {
-            renderChips("strengths", data.start_map.strengths);
+          const startMap = data.start_map || {};
 
-            renderChips("pains", data.start_map.pains);
+          const hasStartMapData = [
+            ...(startMap.strengths || []),
+            ...(startMap.pains || []),
+            ...(startMap.expectations || []),
+            ...(startMap.fears || []),
+          ]
+            .map(cleanText)
+            .some(Boolean);
 
-            renderChips("expectations", data.start_map.expectations);
+          const startEmpty = document.getElementById("startEmpty");
+          const startContent = document.getElementById("startContent");
 
-            renderChips("fears", data.start_map.fears);
+          if (hasStartMapData) {
+            startEmpty.style.display = "none";
+            startContent.style.display = "";
+
+            renderChips("strengths", startMap.strengths);
+            renderChips("pains", startMap.pains);
+            renderChips("expectations", startMap.expectations);
+            renderChips("fears", startMap.fears);
+          } else {
+            startEmpty.style.display = "";
+            startContent.style.display = "none";
           }
 
           // ======================================================
@@ -888,6 +925,14 @@
         }
 
         const items = Array.isArray(mistakes) ? mistakes : [];
+        if (items.length === 0) {
+          container.innerHTML = `
+    <div class="empty-note">
+      Текст появится после заполнения командами формы «Поделиться с миром»
+    </div>
+  `;
+          return;
+        }
 
         // Одна категория = одна карточка.
         // Внутри собираем все истории этой категории.
@@ -983,6 +1028,14 @@
         }
 
         const items = Array.isArray(insights) ? insights : [];
+        if (items.length === 0) {
+          container.innerHTML = `
+    <div class="empty-note">
+      Текст появится после заполнения командами формы «Поделиться с миром»
+    </div>
+  `;
+          return;
+        }
 
         // Одна категория = один аккордеон.
         // Внутри категории собираем все инсайты команд.
@@ -1077,6 +1130,14 @@
         }
 
         const items = Array.isArray(books) ? books : [];
+        if (items.length === 0) {
+          container.innerHTML = `
+    <div class="empty-note">
+      Текст появится после заполнения командами формы «Поделиться с миром»
+    </div>
+  `;
+          return;
+        }
 
         // Группируем отправки по названию книги.
         // Одинаковое название = одна карточка.
