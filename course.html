@@ -757,677 +757,690 @@
     </main>
 
     <script>
-            const teams = [
-              "Команда «Маяк»",
-              "Команда «Высота»",
-              "Команда «Север»",
-              "Команда «Импульс»",
-              "Команда «Вектор»",
-              "Команда «Пульс»",
-              "Команда «Смысл»",
-              "Команда «Горизонт»",
-              "Команда «Точка роста»",
-              "Команда «Созвездие»",
-              "Команда «Движение»",
-              "Команда «Парус»",
-              "Команда «Лаборатория идей»",
-              "Команда «Диалог»",
-              "Команда «Компас»",
-              "Команда «Фокус»",
-              "Команда «Среда»",
-              "Команда «Путь»",
-              "Команда «Вместе»",
-              "Команда «Энергия»",
-              "Команда «Открытие»",
-              "Команда «Шаг вперёд»",
-              "Команда «Перемены»",
-            ];
-            // ======================================================
-            // СТАРТОВАЯ КАРТА — ДАННЫЕ ИЗ API
-            // ======================================================
+      const teams = [
+        "Команда «Маяк»",
+        "Команда «Высота»",
+        "Команда «Север»",
+        "Команда «Импульс»",
+        "Команда «Вектор»",
+        "Команда «Пульс»",
+        "Команда «Смысл»",
+        "Команда «Горизонт»",
+        "Команда «Точка роста»",
+        "Команда «Созвездие»",
+        "Команда «Движение»",
+        "Команда «Парус»",
+        "Команда «Лаборатория идей»",
+        "Команда «Диалог»",
+        "Команда «Компас»",
+        "Команда «Фокус»",
+        "Команда «Среда»",
+        "Команда «Путь»",
+        "Команда «Вместе»",
+        "Команда «Энергия»",
+        "Команда «Открытие»",
+        "Команда «Шаг вперёд»",
+        "Команда «Перемены»",
+      ];
+      // ======================================================
+      // СТАРТОВАЯ КАРТА — ДАННЫЕ ИЗ API
+      // ======================================================
 
-            const API_URL =
-              "https://script.google.com/macros/s/AKfycbwvo20hYq9BOZOmi_dmhT55mdpgRrsPJ1CVy0UkisnoDYTF5jOL7ZOyBr99UXLE42Kp/exec";
+      const API_URL =
+        "https://script.google.com/macros/s/AKfycbwvo20hYq9BOZOmi_dmhT55mdpgRrsPJ1CVy0UkisnoDYTF5jOL7ZOyBr99UXLE42Kp/exec";
 
-            function cleanText(value) {
-              if (value === null || value === undefined) {
-                return "";
-              }
+      function cleanText(value) {
+        if (value === null || value === undefined) {
+          return "";
+        }
 
-              return String(value).trim();
-            }
+        return String(value).trim();
+      }
 
-            function renderChips(id, arr) {
-              const container = document.getElementById(id);
+      function renderChips(id, arr) {
+        const container = document.getElementById(id);
 
-              if (!container) {
-                return;
-              }
+        if (!container) {
+          return;
+        }
 
-              const values = (arr || []).map(cleanText).filter(Boolean);
+        const values = (arr || []).map(cleanText).filter(Boolean);
 
-              const counts = {};
+        const counts = {};
 
-              values.forEach((text) => {
-                counts[text] = (counts[text] || 0) + 1;
-              });
+        values.forEach((text) => {
+          counts[text] = (counts[text] || 0) + 1;
+        });
 
-              container.innerHTML = "";
+        container.innerHTML = "";
 
-              Object.keys(counts).forEach((text) => {
-                const chip = document.createElement("span");
+        Object.keys(counts).forEach((text) => {
+          const chip = document.createElement("span");
 
-                chip.className = counts[text] > 1 ? "chip hot" : "chip";
+          chip.className = counts[text] > 1 ? "chip hot" : "chip";
 
-                chip.textContent =
-                  counts[text] > 1 ? `${text} ×${counts[text]}` : text;
+          chip.textContent =
+            counts[text] > 1 ? `${text} ×${counts[text]}` : text;
 
-                container.appendChild(chip);
-              });
-            }
+          container.appendChild(chip);
+        });
+      }
 
-            async function loadCourseData() {
-              try {
-                const response = await fetch(`${API_URL}?view=course`);
-
-                if (!response.ok) {
-                  throw new Error(`HTTP ${response.status}`);
-                }
-
-                const data = await response.json();
-
-                if (!data.success) {
-                  throw new Error("API не вернул данные страницы курса");
-                }
-
-                // ======================================================
-                // СТАРТОВАЯ КАРТА
-                // ======================================================
-
-                const startMap = data.start_map || {};
-
-                const hasStartMapData = [
-                  ...(startMap.strengths || []),
-                  ...(startMap.pains || []),
-                  ...(startMap.expectations || []),
-                  ...(startMap.fears || []),
-                ]
-                  .map(cleanText)
-                  .some(Boolean);
-
-                const startEmpty = document.getElementById("startEmpty");
-                const startContent = document.getElementById("startContent");
-
-                if (hasStartMapData) {
-                  startEmpty.style.display = "none";
-                  startContent.style.display = "";
-
-                  renderChips("strengths", startMap.strengths);
-                  renderChips("pains", startMap.pains);
-                  renderChips("expectations", startMap.expectations);
-                  renderChips("fears", startMap.fears);
-                } else {
-                  startEmpty.style.display = "";
-                  startContent.style.display = "none";
-                }
-
-                // ======================================================
-                // ИЗБА-ЧИТАЛЬНЯ
-                // ======================================================
-
-                renderBooks(data.share_world?.books, data.team_names || {});
-                requestAnimationFrame(() => {
-                  updateReadMoreButtons();
-                });
-                // ======================================================
-                // НА ОШИБКАХ УЧИМСЯ
-                // ======================================================
-
-                renderMistakes(data.share_world?.mistakes, data.team_names || {});
-
-                requestAnimationFrame(() => {
-                  updateReadMoreButtons();
-                });
-
-                // ======================================================
-                // НАШИ ИНСАЙТЫ
-                // ======================================================
-
-                renderInsights(data.share_world?.insights, data.team_names || {});
-                requestAnimationFrame(() => {
-                  updateReadMoreButtons();
-                });
-
-                // ======================================================
-                // ГОЛОС ШКОЛЫ
-                // ======================================================
-
-                renderVoiceSchool(data.voice_school, data.team_names || {});
-
-                // ======================================================
-                // ОПЫТ ИСПОЛЬЗОВАНИЯ ИНДЕКСА
-                // ======================================================
-
-                renderIndexExperience(data.index_experience, data.team_names || {});
-
-                requestAnimationFrame(() => {
-                  updateReadMoreButtons();
-                });
-
-                const loadingNote = document.getElementById("loadingNote");
-
-                if (loadingNote) {
-                  loadingNote.style.display = "none";
-                }
-              } catch (error) {
-        console.error("Ошибка загрузки страницы курса:", error);
-
+      async function loadCourseData() {
         const loadingNote = document.getElementById("loadingNote");
 
-        if (loadingNote) {
-          loadingNote.textContent =
-            "Не удалось загрузить данные. Попробуйте обновить страницу.";
+        try {
+          const controller = new AbortController();
+
+          const timeoutId = setTimeout(() => {
+            controller.abort();
+          }, 15000);
+
+          const response = await fetch(`${API_URL}?view=course`, {
+            signal: controller.signal,
+          });
+
+          clearTimeout(timeoutId);
+
+          if (!response.ok) {
+            throw new Error(`HTTP ${response.status}`);
+          }
+
+          const data = await response.json();
+
+          if (!data.success) {
+            throw new Error("API не вернул данные страницы курса");
+          }
+
+          // ======================================================
+          // СТАРТОВАЯ КАРТА
+          // ======================================================
+
+          const startMap = data.start_map || {};
+
+          const hasStartMapData = [
+            ...(startMap.strengths || []),
+            ...(startMap.pains || []),
+            ...(startMap.expectations || []),
+            ...(startMap.fears || []),
+          ]
+            .map(cleanText)
+            .some(Boolean);
+
+          const startEmpty = document.getElementById("startEmpty");
+          const startContent = document.getElementById("startContent");
+
+          if (hasStartMapData) {
+            startEmpty.style.display = "none";
+            startContent.style.display = "";
+
+            renderChips("strengths", startMap.strengths);
+            renderChips("pains", startMap.pains);
+            renderChips("expectations", startMap.expectations);
+            renderChips("fears", startMap.fears);
+          } else {
+            startEmpty.style.display = "";
+            startContent.style.display = "none";
+          }
+
+          // ======================================================
+          // ИЗБА-ЧИТАЛЬНЯ
+          // ======================================================
+
+          renderBooks(data.share_world?.books, data.team_names || {});
+          requestAnimationFrame(() => {
+            updateReadMoreButtons();
+          });
+          // ======================================================
+          // НА ОШИБКАХ УЧИМСЯ
+          // ======================================================
+
+          renderMistakes(data.share_world?.mistakes, data.team_names || {});
+
+          requestAnimationFrame(() => {
+            updateReadMoreButtons();
+          });
+
+          // ======================================================
+          // НАШИ ИНСАЙТЫ
+          // ======================================================
+
+          renderInsights(data.share_world?.insights, data.team_names || {});
+          requestAnimationFrame(() => {
+            updateReadMoreButtons();
+          });
+
+          // ======================================================
+          // ГОЛОС ШКОЛЫ
+          // ======================================================
+
+          renderVoiceSchool(data.voice_school, data.team_names || {});
+
+          // ======================================================
+          // ОПЫТ ИСПОЛЬЗОВАНИЯ ИНДЕКСА
+          // ======================================================
+
+          renderIndexExperience(data.index_experience, data.team_names || {});
+
+          requestAnimationFrame(() => {
+            updateReadMoreButtons();
+          });
+
+          const loadingNote = document.getElementById("loadingNote");
+
+          if (loadingNote) {
+            loadingNote.style.display = "none";
+          }
+        } catch (error) {
+          console.error("Ошибка загрузки страницы курса:", error);
+
+          const loadingNote = document.getElementById("loadingNote");
+
+          if (loadingNote) {
+            loadingNote.textContent =
+              "Не удалось загрузить данные. Попробуйте обновить страницу.";
+          }
         }
       }
 
-            loadCourseData();
+      loadCourseData();
 
-            function accordionCard(title, meta, html) {
-              return `<article class="accordion">
-                    <button class="acc-btn">
-                      <span class="acc-title">${title}<span class="acc-meta">${meta}</span></span>
-                      <span class="plus">+</span>
+      function accordionCard(title, meta, html) {
+        return `<article class="accordion">
+                        <button class="acc-btn">
+                          <span class="acc-title">${title}<span class="acc-meta">${meta}</span></span>
+                          <span class="plus">+</span>
+                        </button>
+                        <div class="panel"><div class="panel-inner">${html}</div></div>
+                      </article>`;
+      }
+
+      function renderMistakes(mistakes, teamNames) {
+        const container = document.getElementById("mistakes");
+
+        if (!container) {
+          return;
+        }
+
+        const items = Array.isArray(mistakes) ? mistakes : [];
+        if (items.length === 0) {
+          container.innerHTML = `
+              <div class="empty-note">
+                Текст появится после заполнения командами формы «Поделиться с миром»
+              </div>
+            `;
+          return;
+        }
+
+        // Одна категория = одна карточка.
+        // Внутри собираем все истории этой категории.
+
+        const groups = new Map();
+
+        items.forEach((item) => {
+          const category = cleanText(item.category);
+
+          if (!category) {
+            return;
+          }
+
+          if (!groups.has(category)) {
+            groups.set(category, {
+              category: category,
+              categoryOptionId: Number(item.category_option_id) || 0,
+              stories: [],
+            });
+          }
+
+          const title = cleanText(item.title);
+
+          const text = cleanText(item.text);
+
+          const teamName = cleanText(teamNames?.[item.team_id]);
+
+          groups.get(category).stories.push({
+            title: title,
+            text: text,
+            teamName: teamName,
+          });
+        });
+
+        const mistakeOrder = [
+          22869609, // Организация процессов
+          22869610, // Время и темп
+          22869611, // Коммуникация
+          22869612, // Саморегуляция
+        ];
+
+        const sortedGroups = Array.from(groups.values()).sort((a, b) => {
+          const aIndex = mistakeOrder.indexOf(a.categoryOptionId);
+          const bIndex = mistakeOrder.indexOf(b.categoryOptionId);
+
+          const aOrder = aIndex === -1 ? mistakeOrder.length : aIndex;
+          const bOrder = bIndex === -1 ? mistakeOrder.length : bIndex;
+
+          return aOrder - bOrder;
+        });
+
+        container.innerHTML = sortedGroups
+          .map((group) => {
+            const storiesHtml = group.stories
+              .map((item) => {
+                const titleHtml = item.title
+                  ? `<div class="mistake-story-title">${item.title}</div>`
+                  : "";
+
+                const textHtml = item.text
+                  ? `
+                    <div class="mistake-story-text collapsed">${item.text}</div>
+                    <button type="button" class="read-more-btn mistake-read-more">
+                      Читать далее
                     </button>
-                    <div class="panel"><div class="panel-inner">${html}</div></div>
-                  </article>`;
-            }
-
-            function renderMistakes(mistakes, teamNames) {
-              const container = document.getElementById("mistakes");
-
-              if (!container) {
-                return;
-              }
-
-              const items = Array.isArray(mistakes) ? mistakes : [];
-              if (items.length === 0) {
-                container.innerHTML = `
-          <div class="empty-note">
-            Текст появится после заполнения командами формы «Поделиться с миром»
-          </div>
-        `;
-                return;
-              }
-
-              // Одна категория = одна карточка.
-              // Внутри собираем все истории этой категории.
-
-              const groups = new Map();
-
-              items.forEach((item) => {
-                const category = cleanText(item.category);
-
-                if (!category) {
-                  return;
-                }
-
-                if (!groups.has(category)) {
-                  groups.set(category, {
-                    category: category,
-                    categoryOptionId: Number(item.category_option_id) || 0,
-                    stories: [],
-                  });
-                }
-
-                const title = cleanText(item.title);
-
-                const text = cleanText(item.text);
-
-                const teamName = cleanText(teamNames?.[item.team_id]);
-
-                groups.get(category).stories.push({
-                  title: title,
-                  text: text,
-                  teamName: teamName,
-                });
-              });
-
-              const mistakeOrder = [
-                22869609, // Организация процессов
-                22869610, // Время и темп
-                22869611, // Коммуникация
-                22869612, // Саморегуляция
-              ];
-
-              const sortedGroups = Array.from(groups.values()).sort((a, b) => {
-                const aIndex = mistakeOrder.indexOf(a.categoryOptionId);
-                const bIndex = mistakeOrder.indexOf(b.categoryOptionId);
-
-                const aOrder = aIndex === -1 ? mistakeOrder.length : aIndex;
-                const bOrder = bIndex === -1 ? mistakeOrder.length : bIndex;
-
-                return aOrder - bOrder;
-              });
-
-              container.innerHTML = sortedGroups
-                .map((group) => {
-                  const storiesHtml = group.stories
-                    .map((item) => {
-                      const titleHtml = item.title
-                        ? `<div class="mistake-story-title">${item.title}</div>`
-                        : "";
-
-                      const textHtml = item.text
-                        ? `
-                <div class="mistake-story-text collapsed">${item.text}</div>
-                <button type="button" class="read-more-btn mistake-read-more">
-                  Читать далее
-                </button>
-              `
-                        : "";
-
-                      const teamHtml = item.teamName
-                        ? `<span class="team-tag">${item.teamName}</span>`
-                        : "";
-
-                      return `
-                                <div class="review-item">
-                                  ${titleHtml}
-                                  ${textHtml}
-                                  ${teamHtml}
-                                </div>
-                              `;
-                    })
-                    .join("");
-
-                  return accordionCard(group.category, "", storiesHtml);
-                })
-                .join("");
-            }
-
-            function renderInsights(insights, teamNames) {
-              const container = document.getElementById("insights");
-
-              if (!container) {
-                return;
-              }
-
-              const items = Array.isArray(insights) ? insights : [];
-              if (items.length === 0) {
-                container.innerHTML = `
-          <div class="empty-note">
-            Текст появится после заполнения командами формы «Поделиться с миром»
-          </div>
-        `;
-                return;
-              }
-
-              // Одна категория = один аккордеон.
-              // Внутри категории собираем все инсайты команд.
-              const groups = new Map();
-
-              items.forEach((item) => {
-                const category = cleanText(item.category);
-                const title = cleanText(item.title);
-                const text = cleanText(item.text);
-
-                if (!category || (!title && !text)) {
-                  return;
-                }
-
-                if (!groups.has(category)) {
-                  groups.set(category, {
-                    category: category,
-                    categoryOptionId: Number(item.category_option_id) || 0,
-                    insights: [],
-                  });
-                }
-
-                const teamName = cleanText(teamNames?.[item.team_id]);
-
-                groups.get(category).insights.push({
-                  title: title,
-                  text: text,
-                  teamName: teamName,
-                });
-              });
-
-              // Сначала четыре категории из анкеты,
-              // затем пользовательские варианты "Другое".
-              const insightOrder = [
-                22869613, // Организация процессов
-                22869614, // Время и темп
-                22869615, // Коммуникация
-                22869616, // Саморегуляция
-              ];
-
-              const sortedGroups = Array.from(groups.values()).sort((a, b) => {
-                const aIndex = insightOrder.indexOf(a.categoryOptionId);
-                const bIndex = insightOrder.indexOf(b.categoryOptionId);
-
-                const aOrder = aIndex === -1 ? insightOrder.length : aIndex;
-                const bOrder = bIndex === -1 ? insightOrder.length : bIndex;
-
-                return aOrder - bOrder;
-              });
-
-              container.innerHTML = sortedGroups
-                .map((group) => {
-                  const insightsHtml = group.insights
-                    .map((item) => {
-                      const teamHtml = item.teamName
-                        ? `<span class="team-tag">${item.teamName}</span>`
-                        : "";
-
-                      const titleHtml = item.title
-                        ? `<div class="mistake-story-title">${item.title}</div>`
-                        : "";
-
-                      const textHtml = item.text
-                        ? `
-          <div class="insight-text collapsed">${item.text}</div>
-          <button type="button" class="read-more-btn insight-read-more">
-            Читать далее
-          </button>
-        `
-                        : "";
-                      return `
-        <div class="review-item insight-item">
-          <div class="insight-quote-mark">“</div>
-          ${titleHtml}
-          ${textHtml}
-          ${teamHtml}
-        </div>
-      `;
-                    })
-                    .join("");
-
-                  return accordionCard(group.category, "", insightsHtml);
-                })
-                .join("");
-            }
-
-            function renderBooks(books, teamNames) {
-              const container = document.getElementById("books");
-
-              if (!container) {
-                return;
-              }
-
-              const items = Array.isArray(books) ? books : [];
-              if (items.length === 0) {
-                container.innerHTML = `
-          <div class="empty-note">
-            Текст появится после заполнения командами формы «Поделиться с миром»
-          </div>
-        `;
-                return;
-              }
-
-              // Группируем отправки по названию книги.
-              // Одинаковое название = одна карточка.
-
-              const groups = new Map();
-
-              items.forEach((item) => {
-                const title = cleanText(item.title);
-
-                if (!title) {
-                  return;
-                }
-
-                if (!groups.has(title)) {
-                  groups.set(title, {
-                    title: title,
-                    titleOptionId: Number(item.title_option_id) || 0,
-                    category: cleanText(item.category),
-                    reviews: [],
-                  });
-                }
-
-                const group = groups.get(title);
-
-                // Если у первой записи категория была пустая,
-                // а дальше встретилась заполненная — сохраняем её.
-
-                if (!group.category && cleanText(item.category)) {
-                  group.category = cleanText(item.category);
-                }
-
-                const review = cleanText(item.review);
-                const teamName = cleanText(teamNames?.[item.team_id]);
-
-                if (review || teamName) {
-                  group.reviews.push({
-                    review: review,
-                    teamName: teamName,
-                  });
-                }
-              });
-
-              const bookOrder = [22849767, 22849768, 22849769, 22849771, 22849770];
-
-              const sortedBooks = Array.from(groups.values()).sort((a, b) => {
-                const aIndex = bookOrder.indexOf(a.titleOptionId);
-                const bIndex = bookOrder.indexOf(b.titleOptionId);
-
-                const aOrder = aIndex === -1 ? bookOrder.length : aIndex;
-                const bOrder = bIndex === -1 ? bookOrder.length : bIndex;
-
-                return aOrder - bOrder;
-              });
-
-              container.innerHTML = sortedBooks
-                .map((book) => {
-                  const reviewsHtml = book.reviews
-                    .map((item) => {
-                      const teamHtml = item.teamName
-                        ? `<span class="team-tag">${item.teamName}</span>`
-                        : "";
-
-                      const reviewHtml = item.review
-                        ? `
-                        <div class="book-review-text collapsed">${item.review}</div>
-                        <button type="button" class="read-more-btn">Читать далее</button>
-                      `
-                        : "";
-
-                      return `
-                      <div class="review-item">
-                        ${reviewHtml}
-                        ${teamHtml}
-                      </div>
-                    `;
-                    })
-                    .join("");
-
-                  const meta = book.category || "";
-
-                  return accordionCard(book.title, meta, reviewsHtml);
-                })
-                .join("");
-            }
-
-            function updateReadMoreButtons() {
-              document
-                .querySelectorAll(
-                  ".book-review-text, .mistake-story-text, .insight-text, .experience-text",
-                )
-                .forEach((review) => {
-                  const button = review.nextElementSibling;
-
-                  if (!button || !button.classList.contains("read-more-btn")) {
-                    return;
-                  }
-
-                  review.classList.add("collapsed");
-
-                  const isOverflowing = review.scrollHeight > review.clientHeight + 1;
-
-                  button.style.display = isOverflowing ? "inline-block" : "none";
-                });
-            }
-
-            function renderVoiceSchool(items, teamNames) {
-              const section = document.getElementById("voice-section");
-              const container = document.getElementById("voice");
-              const navLink = document.querySelector('a[href="#voice-section"]');
-
-              if (!section || !container) {
-                return;
-              }
-
-              const responses = (Array.isArray(items) ? items : []).filter((item) =>
-                cleanText(item.text),
-              );
-
-              if (responses.length === 0) {
-                section.style.display = "none";
-
-                if (navLink) {
-                  navLink.style.display = "none";
-                }
-
-                container.innerHTML = "";
-                return;
-              }
-
-              section.style.display = "";
-
-              if (navLink) {
-                navLink.style.display = "";
-              }
-
-              container.innerHTML = responses
-                .map((item) => {
-                  const text = cleanText(item.text);
-                  const teamName = cleanText(teamNames?.[item.team_id]);
-
-                  const teamHtml = teamName
-                    ? `<span class="team-tag">${teamName}</span>`
-                    : "";
-
-                  return `
-              <article class="experience-card">
-                <div class="experience-text collapsed">${text}</div>
-                <button type="button" class="read-more-btn">Читать далее</button>
-                ${teamHtml}
-              </article>
+                  `
+                  : "";
+
+                const teamHtml = item.teamName
+                  ? `<span class="team-tag">${item.teamName}</span>`
+                  : "";
+
+                return `
+                                    <div class="review-item">
+                                      ${titleHtml}
+                                      ${textHtml}
+                                      ${teamHtml}
+                                    </div>
+                                  `;
+              })
+              .join("");
+
+            return accordionCard(group.category, "", storiesHtml);
+          })
+          .join("");
+      }
+
+      function renderInsights(insights, teamNames) {
+        const container = document.getElementById("insights");
+
+        if (!container) {
+          return;
+        }
+
+        const items = Array.isArray(insights) ? insights : [];
+        if (items.length === 0) {
+          container.innerHTML = `
+              <div class="empty-note">
+                Текст появится после заполнения командами формы «Поделиться с миром»
+              </div>
             `;
-                })
-                .join("");
-            }
+          return;
+        }
 
-            function renderIndexExperience(items, teamNames) {
-              const section = document.getElementById("index-section");
-              const container = document.getElementById("indexExperience");
-              const navLink = document.querySelector('a[href="#index-section"]');
+        // Одна категория = один аккордеон.
+        // Внутри категории собираем все инсайты команд.
+        const groups = new Map();
 
-              if (!section || !container) {
-                return;
-              }
+        items.forEach((item) => {
+          const category = cleanText(item.category);
+          const title = cleanText(item.title);
+          const text = cleanText(item.text);
 
-              const responses = (Array.isArray(items) ? items : []).filter((item) =>
-                cleanText(item.text),
-              );
+          if (!category || (!title && !text)) {
+            return;
+          }
 
-              if (responses.length === 0) {
-                section.style.display = "none";
+          if (!groups.has(category)) {
+            groups.set(category, {
+              category: category,
+              categoryOptionId: Number(item.category_option_id) || 0,
+              insights: [],
+            });
+          }
 
-                if (navLink) {
-                  navLink.style.display = "none";
-                }
+          const teamName = cleanText(teamNames?.[item.team_id]);
 
-                container.innerHTML = "";
-                return;
-              }
+          groups.get(category).insights.push({
+            title: title,
+            text: text,
+            teamName: teamName,
+          });
+        });
 
-              section.style.display = "";
+        // Сначала четыре категории из анкеты,
+        // затем пользовательские варианты "Другое".
+        const insightOrder = [
+          22869613, // Организация процессов
+          22869614, // Время и темп
+          22869615, // Коммуникация
+          22869616, // Саморегуляция
+        ];
 
-              if (navLink) {
-                navLink.style.display = "";
-              }
+        const sortedGroups = Array.from(groups.values()).sort((a, b) => {
+          const aIndex = insightOrder.indexOf(a.categoryOptionId);
+          const bIndex = insightOrder.indexOf(b.categoryOptionId);
 
-              container.innerHTML = responses
-                .map((item) => {
-                  const text = cleanText(item.text);
-                  const teamName = cleanText(teamNames?.[item.team_id]);
+          const aOrder = aIndex === -1 ? insightOrder.length : aIndex;
+          const bOrder = bIndex === -1 ? insightOrder.length : bIndex;
 
-                  const teamHtml = teamName
-                    ? `<span class="team-tag">${teamName}</span>`
-                    : "";
+          return aOrder - bOrder;
+        });
 
-                  return `
-              <article class="experience-card">
-                <div class="experience-text collapsed">${text}</div>
-                <button type="button" class="read-more-btn">Читать далее</button>
-                ${teamHtml}
-              </article>
+        container.innerHTML = sortedGroups
+          .map((group) => {
+            const insightsHtml = group.insights
+              .map((item) => {
+                const teamHtml = item.teamName
+                  ? `<span class="team-tag">${item.teamName}</span>`
+                  : "";
+
+                const titleHtml = item.title
+                  ? `<div class="mistake-story-title">${item.title}</div>`
+                  : "";
+
+                const textHtml = item.text
+                  ? `
+              <div class="insight-text collapsed">${item.text}</div>
+              <button type="button" class="read-more-btn insight-read-more">
+                Читать далее
+              </button>
+            `
+                  : "";
+                return `
+            <div class="review-item insight-item">
+              <div class="insight-quote-mark">“</div>
+              ${titleHtml}
+              ${textHtml}
+              ${teamHtml}
+            </div>
+          `;
+              })
+              .join("");
+
+            return accordionCard(group.category, "", insightsHtml);
+          })
+          .join("");
+      }
+
+      function renderBooks(books, teamNames) {
+        const container = document.getElementById("books");
+
+        if (!container) {
+          return;
+        }
+
+        const items = Array.isArray(books) ? books : [];
+        if (items.length === 0) {
+          container.innerHTML = `
+              <div class="empty-note">
+                Текст появится после заполнения командами формы «Поделиться с миром»
+              </div>
             `;
-                })
-                .join("");
+          return;
+        }
+
+        // Группируем отправки по названию книги.
+        // Одинаковое название = одна карточка.
+
+        const groups = new Map();
+
+        items.forEach((item) => {
+          const title = cleanText(item.title);
+
+          if (!title) {
+            return;
+          }
+
+          if (!groups.has(title)) {
+            groups.set(title, {
+              title: title,
+              titleOptionId: Number(item.title_option_id) || 0,
+              category: cleanText(item.category),
+              reviews: [],
+            });
+          }
+
+          const group = groups.get(title);
+
+          // Если у первой записи категория была пустая,
+          // а дальше встретилась заполненная — сохраняем её.
+
+          if (!group.category && cleanText(item.category)) {
+            group.category = cleanText(item.category);
+          }
+
+          const review = cleanText(item.review);
+          const teamName = cleanText(teamNames?.[item.team_id]);
+
+          if (review || teamName) {
+            group.reviews.push({
+              review: review,
+              teamName: teamName,
+            });
+          }
+        });
+
+        const bookOrder = [22849767, 22849768, 22849769, 22849771, 22849770];
+
+        const sortedBooks = Array.from(groups.values()).sort((a, b) => {
+          const aIndex = bookOrder.indexOf(a.titleOptionId);
+          const bIndex = bookOrder.indexOf(b.titleOptionId);
+
+          const aOrder = aIndex === -1 ? bookOrder.length : aIndex;
+          const bOrder = bIndex === -1 ? bookOrder.length : bIndex;
+
+          return aOrder - bOrder;
+        });
+
+        container.innerHTML = sortedBooks
+          .map((book) => {
+            const reviewsHtml = book.reviews
+              .map((item) => {
+                const teamHtml = item.teamName
+                  ? `<span class="team-tag">${item.teamName}</span>`
+                  : "";
+
+                const reviewHtml = item.review
+                  ? `
+                            <div class="book-review-text collapsed">${item.review}</div>
+                            <button type="button" class="read-more-btn">Читать далее</button>
+                          `
+                  : "";
+
+                return `
+                          <div class="review-item">
+                            ${reviewHtml}
+                            ${teamHtml}
+                          </div>
+                        `;
+              })
+              .join("");
+
+            const meta = book.category || "";
+
+            return accordionCard(book.title, meta, reviewsHtml);
+          })
+          .join("");
+      }
+
+      function updateReadMoreButtons() {
+        document
+          .querySelectorAll(
+            ".book-review-text, .mistake-story-text, .insight-text, .experience-text",
+          )
+          .forEach((review) => {
+            const button = review.nextElementSibling;
+
+            if (!button || !button.classList.contains("read-more-btn")) {
+              return;
             }
 
-            document.addEventListener("click", (event) => {
-              const button = event.target.closest(".read-more-btn");
+            review.classList.add("collapsed");
 
-              if (!button) {
-                return;
-              }
+            const isOverflowing = review.scrollHeight > review.clientHeight + 1;
 
-              const review = button.previousElementSibling;
+            button.style.display = isOverflowing ? "inline-block" : "none";
+          });
+      }
 
-              if (
-                !review ||
-                (!review.classList.contains("book-review-text") &&
-                  !review.classList.contains("mistake-story-text") &&
-                  !review.classList.contains("insight-text") &&
-                  !review.classList.contains("experience-text"))
-              ) {
-                return;
-              }
+      function renderVoiceSchool(items, teamNames) {
+        const section = document.getElementById("voice-section");
+        const container = document.getElementById("voice");
+        const navLink = document.querySelector('a[href="#voice-section"]');
 
-              const isCollapsed = review.classList.toggle("collapsed");
+        if (!section || !container) {
+          return;
+        }
 
-              button.textContent = isCollapsed ? "Читать далее" : "Свернуть";
+        const responses = (Array.isArray(items) ? items : []).filter((item) =>
+          cleanText(item.text),
+        );
 
-              const accordion = button.closest(".accordion");
+        if (responses.length === 0) {
+          section.style.display = "none";
 
-              if (accordion && accordion.classList.contains("open")) {
-                const panel = accordion.querySelector(".panel");
-                const inner = accordion.querySelector(".panel-inner");
+          if (navLink) {
+            navLink.style.display = "none";
+          }
 
-                if (panel && inner) {
-                  panel.style.height = inner.scrollHeight + "px";
-                }
-              }
-            });
+          container.innerHTML = "";
+          return;
+        }
 
-            document.addEventListener("click", (event) => {
-              const btn = event.target.closest(".acc-btn");
+        section.style.display = "";
 
-              if (!btn) {
-                return;
-              }
+        if (navLink) {
+          navLink.style.display = "";
+        }
 
-              const item = btn.closest(".accordion");
+        container.innerHTML = responses
+          .map((item) => {
+            const text = cleanText(item.text);
+            const teamName = cleanText(teamNames?.[item.team_id]);
 
-              if (!item) {
-                return;
-              }
+            const teamHtml = teamName
+              ? `<span class="team-tag">${teamName}</span>`
+              : "";
 
-              const panel = item.querySelector(".panel");
+            return `
+                  <article class="experience-card">
+                    <div class="experience-text collapsed">${text}</div>
+                    <button type="button" class="read-more-btn">Читать далее</button>
+                    ${teamHtml}
+                  </article>
+                `;
+          })
+          .join("");
+      }
 
-              const inner = item.querySelector(".panel-inner");
+      function renderIndexExperience(items, teamNames) {
+        const section = document.getElementById("index-section");
+        const container = document.getElementById("indexExperience");
+        const navLink = document.querySelector('a[href="#index-section"]');
 
-              if (!panel || !inner) {
-                return;
-              }
+        if (!section || !container) {
+          return;
+        }
 
-              const open = item.classList.toggle("open");
+        const responses = (Array.isArray(items) ? items : []).filter((item) =>
+          cleanText(item.text),
+        );
 
-              panel.style.height = open ? inner.scrollHeight + "px" : "0px";
-            });
+        if (responses.length === 0) {
+          section.style.display = "none";
+
+          if (navLink) {
+            navLink.style.display = "none";
+          }
+
+          container.innerHTML = "";
+          return;
+        }
+
+        section.style.display = "";
+
+        if (navLink) {
+          navLink.style.display = "";
+        }
+
+        container.innerHTML = responses
+          .map((item) => {
+            const text = cleanText(item.text);
+            const teamName = cleanText(teamNames?.[item.team_id]);
+
+            const teamHtml = teamName
+              ? `<span class="team-tag">${teamName}</span>`
+              : "";
+
+            return `
+                  <article class="experience-card">
+                    <div class="experience-text collapsed">${text}</div>
+                    <button type="button" class="read-more-btn">Читать далее</button>
+                    ${teamHtml}
+                  </article>
+                `;
+          })
+          .join("");
+      }
+
+      document.addEventListener("click", (event) => {
+        const button = event.target.closest(".read-more-btn");
+
+        if (!button) {
+          return;
+        }
+
+        const review = button.previousElementSibling;
+
+        if (
+          !review ||
+          (!review.classList.contains("book-review-text") &&
+            !review.classList.contains("mistake-story-text") &&
+            !review.classList.contains("insight-text") &&
+            !review.classList.contains("experience-text"))
+        ) {
+          return;
+        }
+
+        const isCollapsed = review.classList.toggle("collapsed");
+
+        button.textContent = isCollapsed ? "Читать далее" : "Свернуть";
+
+        const accordion = button.closest(".accordion");
+
+        if (accordion && accordion.classList.contains("open")) {
+          const panel = accordion.querySelector(".panel");
+          const inner = accordion.querySelector(".panel-inner");
+
+          if (panel && inner) {
+            panel.style.height = inner.scrollHeight + "px";
+          }
+        }
+      });
+
+      document.addEventListener("click", (event) => {
+        const btn = event.target.closest(".acc-btn");
+
+        if (!btn) {
+          return;
+        }
+
+        const item = btn.closest(".accordion");
+
+        if (!item) {
+          return;
+        }
+
+        const panel = item.querySelector(".panel");
+
+        const inner = item.querySelector(".panel-inner");
+
+        if (!panel || !inner) {
+          return;
+        }
+
+        const open = item.classList.toggle("open");
+
+        panel.style.height = open ? inner.scrollHeight + "px" : "0px";
+      });
     </script>
   </body>
 </html>
