@@ -199,6 +199,23 @@
         font-weight: 700;
       }
 
+      .start-chips-toggle {
+        display: block;
+        margin-top: 12px;
+        padding: 0;
+        border: 0;
+        background: transparent;
+        color: var(--green);
+        font: inherit;
+        font-size: 12px;
+        font-weight: 700;
+        cursor: pointer;
+      }
+
+      .start-chips-toggle:hover {
+        text-decoration: underline;
+      }
+
       .cards {
         display: grid;
         grid-template-columns: repeat(3, 1fr);
@@ -818,6 +835,8 @@
         return String(value).trim();
       }
 
+      const START_CHIPS_LIMIT = 10;
+
       function renderChips(id, arr) {
         const container = document.getElementById(id);
 
@@ -828,24 +847,88 @@
         const values = (arr || []).map(cleanText).filter(Boolean);
 
         const counts = {};
+        const firstPosition = {};
 
-        values.forEach((text) => {
+        values.forEach((text, index) => {
           counts[text] = (counts[text] || 0) + 1;
+
+          if (firstPosition[text] === undefined) {
+            firstPosition[text] = index;
+          }
+        });
+
+        // Сначала самые частотные ответы.
+        // При одинаковой частоте сохраняем исходный порядок.
+        const sortedValues = Object.keys(counts).sort((a, b) => {
+          const countDifference = counts[b] - counts[a];
+
+          if (countDifference !== 0) {
+            return countDifference;
+          }
+
+          return firstPosition[a] - firstPosition[b];
         });
 
         container.innerHTML = "";
 
-        Object.keys(counts).forEach((text) => {
+        sortedValues.forEach((text, index) => {
           const chip = document.createElement("span");
 
           chip.className = counts[text] > 1 ? "chip hot" : "chip";
+
+          if (index >= START_CHIPS_LIMIT) {
+            chip.style.display = "none";
+            chip.classList.add("start-chip-extra");
+          }
 
           chip.textContent =
             counts[text] > 1 ? `${text} ×${counts[text]}` : text;
 
           container.appendChild(chip);
         });
+
+        if (sortedValues.length > START_CHIPS_LIMIT) {
+          const button = document.createElement("button");
+
+          button.type = "button";
+          button.className = "start-chips-toggle";
+          button.dataset.target = id;
+          button.dataset.expanded = "false";
+
+          button.textContent = `Показать ещё ${
+            sortedValues.length - START_CHIPS_LIMIT
+          }`;
+
+          container.insertAdjacentElement("afterend", button);
+        }
       }
+
+      document.addEventListener("click", (event) => {
+        const button = event.target.closest(".start-chips-toggle");
+
+        if (!button) {
+          return;
+        }
+
+        const container = document.getElementById(button.dataset.target);
+
+        if (!container) {
+          return;
+        }
+
+        const extraChips = container.querySelectorAll(".start-chip-extra");
+        const isExpanded = button.dataset.expanded === "true";
+
+        extraChips.forEach((chip) => {
+          chip.style.display = isExpanded ? "none" : "";
+        });
+
+        button.dataset.expanded = isExpanded ? "false" : "true";
+
+        button.textContent = isExpanded
+          ? `Показать ещё ${extraChips.length}`
+          : "Свернуть";
+      });
 
       async function loadCourseData() {
         const loadingNote = document.getElementById("loadingNote");
