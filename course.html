@@ -834,6 +834,20 @@
 
         return String(value).trim();
       }
+      function hasRealAnswer(value) {
+        const text = cleanText(value);
+
+        if (!text) return false;
+
+        const normalized = text
+          .toLowerCase()
+          .replace(/[.!?]+$/, "")
+          .trim();
+
+        return !["нет ответа", "ответ не указан", "не заполнено"].includes(
+          normalized,
+        );
+      }
 
       const START_CHIPS_LIMIT = 10;
 
@@ -1395,7 +1409,7 @@
         }
 
         const responses = (Array.isArray(items) ? items : []).filter((item) =>
-          cleanText(item.text),
+          hasRealAnswer(item.text),
         );
 
         if (responses.length === 0) {
@@ -1445,7 +1459,7 @@
         }
 
         const responses = (Array.isArray(items) ? items : []).filter((item) =>
-          cleanText(item.text),
+          hasRealAnswer(item.text),
         );
 
         if (responses.length === 0) {
